@@ -22,6 +22,7 @@ public abstract class Configuration{
 
 	private final File file;
 	private final Map<String, ConfigSection> sections;
+	private final Directories dirs;
 	private final SystemConfig system;
 	private final Properties env = new Properties();
 
@@ -29,6 +30,7 @@ public abstract class Configuration{
 		this.file = file;
 		this.sections = new HashMap<>();
 		this.system = new SystemConfig(system);
+		this.dirs = Directories.create(this);
 	}
 	public Configuration(final File file,
 		final Properties system, final Map<String, String> env
@@ -48,6 +50,22 @@ public abstract class Configuration{
 	public SystemConfig getSystem(){ return system; }
 	public String getEnv(final String property){
 		return env.getProperty(property);
+	}
+
+	public File getConfigDir(final String identifier){
+		return dirs.getConfigDir(identifier);
+	}
+	public File getDataDir(final String identifier){
+		return dirs.getDataDir(identifier);
+	}
+	public File getCacheDir(final String identifier){
+		return dirs.getCacheDir(identifier);
+	}
+	public File getTempDir(final String identifier){
+		return dirs.getTempDir(identifier);
+	}
+	public File getLogDir(final String identifier){
+		return dirs.getLogDir(identifier);
 	}
 
 	// SETTERS
