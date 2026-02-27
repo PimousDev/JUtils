@@ -5,10 +5,10 @@ import dev.pimous.pu.jutils.base.InternalException;
 import java.util.Properties;
 
 /**
- * @author Xibitol
+ * @author APG-Gillardeau
  * @since 1.0.0
  */
-public class SystemConfig extends ConfigSection{
+public final class SystemConfig extends ConfigSection{
 
 	@ConfigField(property="os.name")
 	private String osName;
