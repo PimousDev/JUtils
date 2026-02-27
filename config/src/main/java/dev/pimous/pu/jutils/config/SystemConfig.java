@@ -1,5 +1,7 @@
 package dev.pimous.pu.jutils.config;
 
+import dev.pimous.pu.jutils.base.InternalException;
+
 import java.util.Properties;
 
 /**
@@ -14,7 +16,11 @@ public class SystemConfig extends ConfigSection{
 	private String home;
 
 	public SystemConfig(final Properties properties){
-		super(properties);
+		try{
+			load(properties);
+		}catch(ConfigPropertyException e){
+			throw new InternalException(e);
+		}
 	}
 
 	// GETTERS
