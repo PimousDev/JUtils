@@ -54,7 +54,7 @@ public class LinuxDirs extends AbstractDirs{
 
 	@Override
 	public File getGlobalTempDir(){
-		return new File(getConfig().getEnv(TEMP_DIR_PROP_NAME));
+		return new File(getConfig().getEnv(TEMP_DIR_PROP_NAME, TEMP_DIR));
 	}
 	@Override
 	public File getTempDir(final String identifier){

@@ -48,8 +48,8 @@ public abstract class Configuration{
 			.findFirst().get();
 	}
 	public SystemConfig getSystem(){ return system; }
-	public String getEnv(final String property){
-		return env.getProperty(property);
+	public String getEnv(final String property, final String defaultValue){
+		return env.getProperty(property, defaultValue);
 	}
 
 	public File getConfigDir(final String identifier){
