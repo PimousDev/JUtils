@@ -1,5 +1,9 @@
 package dev.pimous.pu.jutils.config;
 
+/**
+ * @author APG-Gillardeau
+ * @since 1.0.0
+ */
 public class ConfigException extends Exception{
 
 	public ConfigException(Throwable cause){

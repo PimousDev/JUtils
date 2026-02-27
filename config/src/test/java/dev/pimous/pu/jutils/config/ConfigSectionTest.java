@@ -74,7 +74,7 @@ class ConfigSectionTest{
 	}
 
 	// INNER CLASSES
-	private static class TestConfig extends ConfigSection{
+	public static class TestConfig extends ConfigSection{
 
 		@ConfigSection.ConfigField(property = "name")
 		private String f = "F";
@@ -93,44 +93,6 @@ class ConfigSectionTest{
 				case "version" -> Version::new;
 				default -> super.getParser(property);
 			};
-		}
-	}
-	private static class SocketConfig extends ConfigSection{
-
-		@ConfigSection.ConfigField
-		private InetAddress host = InetAddress.getLoopbackAddress();
-		@ConfigSection.ConfigField
-		private short port = 31000;
-
-		// GETTERS
-		@Override
-		protected Function<? super String, ?> getParser(String property){
-			return switch(property){
-				case "host" -> this::parseHost;
-				case "port" -> this::parsePort;
-				default -> super.getParser(property);
-			};
-		}
-
-		// FUNCTIONS
-		private InetAddress parseHost(final String value){
-			try{
-				return InetAddress.getByName(value);
-			}catch(UnknownHostException e){
-				throw new IllegalArgumentException(e);
-			}
-		}
-		private short parsePort(final String value){
-			try{
-				Integer port = Integer.parseInt(value);
-
-				if(port < 0 || port >= 65535)
-					throw new NumberFormatException();
-
-				return port.shortValue();
-			}catch(final NumberFormatException e){
-				throw new IllegalArgumentException(e);
-			}
 		}
 	}
 }

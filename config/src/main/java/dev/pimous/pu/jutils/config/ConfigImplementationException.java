@@ -3,7 +3,7 @@ package dev.pimous.pu.jutils.config;
 import dev.pimous.pu.jutils.base.InternalException;
 
 /**
- * @author Xibitol
+ * @author APG-Gillardeau
  * @since 1.0.0
  */
 public class ConfigImplementationException extends InternalException{

@@ -10,6 +10,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Xibitol
@@ -95,14 +97,34 @@ public abstract class Configuration{
 	}
 
 	// Loading
-	public void load() throws FileNotFoundException, IOException{
+	public void load() throws
+		ConfigPropertyException, IllegalArgumentException,
+		FileNotFoundException, IOException
+	{
 		load(file);
 	}
 
-	private void load(final Properties properties){
-		// TODO: Implement.
+	private void load(final Properties properties)
+		throws ConfigPropertyException, IllegalArgumentException
+	{
+		for(Map.Entry<String, ConfigSection> e : sections.entrySet()){
+			final String prefix = e.getKey() + SECTION_DELIMITER;
+
+			final Properties sectionProps = new Properties();
+			sectionProps.putAll(properties.stringPropertyNames().stream()
+				.filter(p -> p.startsWith(prefix))
+				.collect(Collectors.toMap(
+					p -> p.substring(prefix.length()),
+					p -> properties.getProperty(p)
+				))
+			);
+
+			e.getValue().load(sectionProps);
+		}
 	}
-	public void load(final InputStream stream) throws IOException{
+	public void load(final InputStream stream)
+		throws ConfigPropertyException, IllegalArgumentException, IOException
+	{
 		Properties props = new Properties();
 
 		try{
@@ -115,7 +137,10 @@ public abstract class Configuration{
 
 		load(props);
 	}
-	private void load(final File file) throws FileNotFoundException, IOException{
+	private void load(final File file) throws
+		ConfigPropertyException, IllegalArgumentException,
+		FileNotFoundException, IOException
+	{
 		try(FileInputStream fis = new FileInputStream(file)){
 			load(fis);
 		}catch(final FileNotFoundException e){
