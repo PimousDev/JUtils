@@ -96,7 +96,7 @@ class ConfigSectionTest{
 		@ConfigSection.ConfigField(property = "name")
 		private String f = "F";
 		@ConfigSection.ConfigField(readonly = false)
-		private int number = 20;
+		public int number = 20;
 		@ConfigSection.ConfigField(mandatory = true)
 		private Version version;
 		@ConfigSection.ConfigField()

@@ -3,10 +3,11 @@ package dev.pimous.pu.jutils.config;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
+import java.io.*;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -122,6 +123,38 @@ class ConfigurationTest{
 		assertEquals("20", props.getProperty("test.number"));
 	}
 
+	@Test
+	void saving(){
+		final ServerConfig config = new ServerConfig(
+			getProperties("config/system.properties"), env
+		);
+
+		assertTrue(!ServerConfig.file.exists());
+		assertDoesNotThrow(() -> config.save(""));
+		assertTrue(ServerConfig.file.exists());
+		assertTrue(ServerConfig.file.length() > 0);
+		try(FileReader fis = new FileReader(ServerConfig.file)){
+			final Properties props = new Properties();
+			props.load(fis);
+			assertEquals(6, props.size());
+		}catch(final IOException ignored){}
+
+		config.getSection(ConfigSectionTest.TestConfig.class).number = 124;
+		config.getSection(SocketConfig.class).port = 31012;
+
+		final long oldLength = ServerConfig.file.length();
+		assertDoesNotThrow(() -> config.save(""));
+		assertEquals(oldLength + 1, ServerConfig.file.length());
+		try(FileReader fis = new FileReader(ServerConfig.file)){
+			final Properties props = new Properties();
+			props.load(fis);
+
+			assertEquals(6, props.size());
+			assertEquals("124", props.getProperty("test.number"));
+			assertEquals("31000", props.getProperty("socket.port"));
+		}catch(final IOException ignored){}
+	}
+
 	// FUNCTIONS
 	private Properties getProperties(String resource){
 		final Properties props = new Properties();
@@ -139,7 +172,7 @@ class ConfigurationTest{
 		@ConfigSection.ConfigField
 		private InetAddress host = InetAddress.getLoopbackAddress();
 		@ConfigSection.ConfigField
-		private short port = 31000;
+		public short port = 31000;
 
 		// GETTERS
 		@Override

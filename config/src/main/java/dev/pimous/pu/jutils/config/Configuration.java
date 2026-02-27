@@ -212,22 +212,43 @@ public abstract class Configuration{
 
 	// Saving
 	public void save(final String comments) throws IOException{
+		Properties props;
+
+		// Creates file (and loads initial configuration if exists)
 		try{
-			file.createNewFile();
+			if(file.createNewFile())
+				props = toProperties();
+			else{
+				props = new Properties();
+
+				try(FileReader fis = new FileReader(file,
+					Charset.defaultCharset()
+				)){
+					props.load(fis);
+				}catch(final IOException e){
+					throw new IOException(
+						"Cannot read configuration file at %s;".formatted(file),
+						e
+					);
+				}
+
+				props.putAll(toSavedProperties());
+			}
 		}catch(final IOException e){
 			throw new IOException(
-				"Cannot create configuration file at %s.".formatted(file), e
+				"Cannot create configuration file at %s;".formatted(file), e
 			);
 		}
 
+		// Saves configuration
 		// FIXME: Handle user timezone.
 		try(FileWriter fos = new FileWriter(file, Charset.defaultCharset())){
-			toProperties().store(fos, COMMENT_FORMAT.formatted(comments,
+			props.store(fos, COMMENT_FORMAT.formatted(comments,
 				OffsetDateTime.now(ZoneOffset.UTC)
 			));
 		}catch(final IOException e){
 			throw new IOException(
-				"Cannot write configuration file at %s.".formatted(file), e
+				"Cannot write configuration file at %s;".formatted(file), e
 			);
 		}
 	}
