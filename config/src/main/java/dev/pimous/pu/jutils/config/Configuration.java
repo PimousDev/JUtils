@@ -11,6 +11,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +23,9 @@ public abstract class Configuration{
 
 	public static final String COMMENT_FORMAT = "%s - Saved at %s";
 	public static final char SECTION_DELIMITER = '.';
+	public static final Pattern PROPERTY_PATTERN = Pattern.compile(
+		"^(?<section>[^.]+)\\.(?<property>.+)$"
+	);
 
 	private final File file;
 	private final Map<String, ConfigSection> sections;
@@ -48,6 +53,21 @@ public abstract class Configuration{
 			.filter(sectionClass::isInstance)
 			.map(sectionClass::cast)
 			.findFirst().get();
+	}
+	public Optional<Object> get(final String property){
+		final Matcher m = PROPERTY_PATTERN.matcher(property);
+		if(!m.matches())
+			throw new IllegalArgumentException(
+				"Section name wasn't recognized (Got \"%s\");".formatted(
+					property
+				)
+			);
+
+		return Optional.ofNullable(sections.get(m.group("section")))
+			.map(cs -> cs.get(m.group("property")).get());
+	}
+	public Optional<String> getString(final String property){
+		return get(property).map(String.class::cast);
 	}
 	public SystemConfig getSystem(){ return system; }
 	public String getEnv(final String property, final String defaultValue){

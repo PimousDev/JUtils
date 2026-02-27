@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ConfigurationTest{
+class ConfigurationTest{
 
 	final Map<String, String> env = Map.of(
 		"java.io.tmpdir", "tmp/"
@@ -37,6 +37,23 @@ public class ConfigurationTest{
 		assertDoesNotThrow(() -> config.getSection(SocketConfig.class));
 		assertThrows(NoSuchElementException.class,
 			() -> config.getSection(DummyConfig.class)
+		);
+
+		assertThrows(IllegalArgumentException.class,
+			() -> config.get("host").get()
+		);
+		assertEquals("test", config.getString("test.a").get());
+		assertEquals("F", config.get("test.name").get());
+		assertEquals(20, config.get("test.number").get());
+		assertThrows(ClassCastException.class,
+			() -> config.getString("test.number")
+		);
+		assertEquals(InetAddress.getLoopbackAddress(),
+			config.get("socket.host").get()
+		);
+		assertEquals((short) 31000, config.get("socket.port").get());
+		assertThrows(NoSuchElementException.class,
+			() -> config.get("undefined.l").get()
 		);
 
 		assertEquals("GillardeauOS", config.getSystem().getOSName());
