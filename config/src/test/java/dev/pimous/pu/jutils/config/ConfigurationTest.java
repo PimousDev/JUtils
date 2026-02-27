@@ -101,6 +101,27 @@ class ConfigurationTest{
 		));
 	}
 
+	@Test
+	void toProperties(){
+		final ServerConfig config = new ServerConfig(
+			getProperties("config/system.properties"), env
+		);
+		Properties props;
+
+		props = config.toProperties();
+		assertEquals(6, props.size());
+		assertEquals("F", props.getProperty("test.name"));
+		assertEquals("20", props.getProperty("test.number"));
+		assertEquals("null", props.getProperty("test.version"));
+		assertEquals("test", props.getProperty("test.a"));
+		assertEquals("localhost/127.0.0.1", props.getProperty("socket.host"));
+		assertEquals("31000", props.getProperty("socket.port"));
+
+		props = config.toSavedProperties();
+		assertEquals(1, props.size());
+		assertEquals("20", props.getProperty("test.number"));
+	}
+
 	// FUNCTIONS
 	private Properties getProperties(String resource){
 		final Properties props = new Properties();

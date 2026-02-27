@@ -4,6 +4,7 @@ import dev.pimous.pu.jutils.base.BadResourceException;
 import dev.pimous.pu.jutils.base.ResourcePaths;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -11,6 +12,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -64,7 +67,7 @@ public abstract class Configuration{
 			);
 
 		return Optional.ofNullable(sections.get(m.group("section")))
-			.map(cs -> cs.get(m.group("property")).get());
+			.map(s -> s.get(m.group("property")).get());
 	}
 	public Optional<String> getString(final String property){
 		return get(property).map(String.class::cast);
@@ -182,9 +185,29 @@ public abstract class Configuration{
 	}
 
 	// FUNCTIONS
-	public Properties toProperties(){
-		Properties props = new Properties();
+	private final Properties toProperties(
+		Function<ConfigSection, Properties> getter
+	){
+		final Properties props = new Properties();
+
+		sections.forEach((n, s) ->
+			props.putAll(getter.apply(s).entrySet().stream()
+				.map(e -> Map.entry(
+					n + SECTION_DELIMITER + e.getKey(), e.getValue()
+				))
+				.collect(Collectors.toMap(
+					Map.Entry::getKey, Map.Entry::getValue
+				))
+			)
+		);
+
 		return props;
+	}
+	public Properties toProperties(){
+		return toProperties(ConfigSection::toProperties);
+	}
+	public Properties toSavedProperties(){
+		return toProperties(ConfigSection::toSavedProperties);
 	}
 
 	// Saving
