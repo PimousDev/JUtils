@@ -62,6 +62,23 @@ class ConfigSectionTest{
 		);
 	}
 
+	@Test
+	void toProperties(){
+		final TestConfig tc = new TestConfig();
+		Properties props;
+
+		props = tc.toProperties();
+		assertEquals(4, props.size());
+		assertEquals("F", props.getProperty("name"));
+		assertEquals("20", props.getProperty("number"));
+		assertEquals("null", props.getProperty("version"));
+		assertEquals("test", props.getProperty("a"));
+
+		props = tc.toSavedProperties();
+		assertEquals(1, props.size());
+		assertEquals("20", props.getProperty("number"));
+	}
+
 	// FUNCTIONS
 	private Properties getProperties(String resource){
 		final Properties props = new Properties();
@@ -94,5 +111,11 @@ class ConfigSectionTest{
 				default -> super.getParser(property);
 			};
 		}
+	}
+
+	private static class UninitializedConfig extends ConfigSection{
+
+		@ConfigSection.ConfigField
+		private Version a;
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -91,13 +92,15 @@ public abstract class ConfigSection{
 	}
 
 	// FUNCTIONS
-	public final Properties toProperties(){
+	private final Properties toProperties(Predicate<Field> filter){
 		final Properties props = new Properties();
 
-		getFields().forEach(f -> {
+		getFields().filter(filter).forEach(f -> {
 			try{
 				f.setAccessible(true); // BUG: Is this can fail?
-				props.setProperty(getPropertyName(f), f.get(this).toString());
+				props.setProperty(getPropertyName(f),
+					String.valueOf(f.get(this))
+				);
 			}catch(Exception e){
 				throw new ConfigImplementationException(
 					"Unable to get value of %s field;".formatted(f.getName()), e
@@ -107,17 +110,13 @@ public abstract class ConfigSection{
 
 		return props;
 	}
+	public final Properties toProperties(){
+		return toProperties(f -> true);
+	}
 	public final Properties toSavedProperties(){
-		final Properties props = toProperties();
-		final Properties savedProps = new Properties();
-
-		getFields().filter(f -> f.getAnnotation(ConfigField.class).readonly())
-			.forEach(f -> {
-				final String p = getPropertyName(f);
-				savedProps.setProperty(p, props.getProperty(p));
-			});
-
-		return props;
+		return toProperties(
+			f -> !f.getAnnotation(ConfigField.class).readonly()
+		);
 	}
 
 	// INNER CLASSES
