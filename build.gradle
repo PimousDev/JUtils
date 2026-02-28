@@ -41,3 +41,13 @@ project(":config"){
 		api project(":base")
 	}
 }
+project(":i18n"){
+	description = configDescription
+
+	apply plugin: "java-library"
+
+	dependencies{
+		api project(":base")
+		implementation project(":config")
+	}
+}
