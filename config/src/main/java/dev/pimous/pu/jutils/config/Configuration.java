@@ -152,7 +152,7 @@ public abstract class Configuration{
 
 		try{
 			props.load(new InputStreamReader(stream, Charset.defaultCharset()));
-		}catch(final IOException e){
+		}catch(final IOException|IllegalArgumentException e){
 			throw new IOException(
 				"Cannot read properties (%s);".formatted(e.getMessage()), e
 			);
