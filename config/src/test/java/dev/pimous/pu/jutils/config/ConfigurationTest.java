@@ -159,8 +159,10 @@ class ConfigurationTest{
 	private Properties getProperties(String resource){
 		final Properties props = new Properties();
 
-		try{
-			props.load(ClassLoader.getSystemResourceAsStream(resource));
+		try(final InputStream is = ClassLoader.getSystemResourceAsStream(
+			resource
+		)){
+			props.load(is);
 		}catch(Exception ignored){}
 
 		return props;

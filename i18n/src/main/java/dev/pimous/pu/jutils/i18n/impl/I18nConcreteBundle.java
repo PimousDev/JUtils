@@ -77,16 +77,15 @@ public class I18nConcreteBundle implements I18nBundle{
 			locale, section
 		);
 
-		final InputStream is = ClassLoader.getSystemResourceAsStream(path);
-		if(is == null)
-			throw new BadResourceException(
-				"%s sentence section doesn't exists for %s locale"
-					.formatted(section, locale.toLanguageTag()),
-				path,
-				new FileNotFoundException(path)
-			);
+		try(final InputStream is = ClassLoader.getSystemResourceAsStream(path)){
+			if(is == null)
+				throw new BadResourceException(
+					"%s sentence section doesn't exists for %s locale"
+						.formatted(section, locale.toLanguageTag()),
+					path,
+					new FileNotFoundException(path)
+				);
 
-		try{
 			sentences = new Properties(sentences);
 			sentences.load(new InputStreamReader(is, charset));
 		}catch(final IOException|IllegalArgumentException e){

@@ -5,6 +5,7 @@ import dev.pimous.pu.jutils.config.SystemConfig;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.InputStream;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Locale;
@@ -42,8 +43,10 @@ class LocalizationConfigTest{
 	private Properties getProperties(String resource){
 		final Properties props = new Properties();
 
-		try{
-			props.load(ClassLoader.getSystemResourceAsStream(resource));
+		try(final InputStream is = ClassLoader.getSystemResourceAsStream(
+			resource
+		)){
+			props.load(is);
 		}catch(Exception ignored){}
 
 		return props;
