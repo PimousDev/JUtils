@@ -21,7 +21,7 @@ class LevelTest{
 
 		assertEquals(Level.OFF, -1);
 		assertEquals(Level.VERBOSE, 5);
-		assertEquals(Level.TRACE, 7);
+		assertEquals(Level.ALL, 7);
 	}
 	@Test
 	void aliases(){
