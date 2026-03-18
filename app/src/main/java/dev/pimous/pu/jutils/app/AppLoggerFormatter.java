@@ -2,9 +2,8 @@ package dev.pimous.pu.jutils.app;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
+import java.time.Instant;
+import java.util.logging.*;
 
 /**
  * @author Xibitol
@@ -12,15 +11,19 @@ import java.util.logging.LogRecord;
  */
 public class AppLoggerFormatter extends Formatter{
 
+	private static final String LOG_HEAD_FORMAT
+		= "STARTED logging at %1$tY/%1$tm/%1$tdT%1$tT.%2$09d:";
 	private static final String LOG_FORMAT
-		= "(%1$d - %2$tDT%2$tT.%2$tN){T:%3$d}[%4$s] %5$s%n";
+		= "(%1$d - %2$tY/%2$tm/%2$tdT%2$tT.%3$09d){T:%4$d}[%5$s] %6$s%n";
+	private static final String LOG_TAIL_FORMAT
+		= "FINISHED logging at %1$tY/%1$tm/%1$tdT%1$tT.%2$09d.";
 	private static final String COLORED_LEVEL_FORMAT
 		= "\u001b[1;38;5;%2$dm%1$s\u001b[0m";
 
-	private final boolean colorized;
+	private final boolean inConsole;
 
-	public AppLoggerFormatter(boolean colorized){
-		this.colorized = colorized;
+	public AppLoggerFormatter(boolean inConsole){
+		this.inConsole = inConsole;
 	}
 
 	// GETTERS
@@ -34,6 +37,21 @@ public class AppLoggerFormatter extends Formatter{
 			case "CONFIG" -> COLORED_LEVEL_FORMAT.formatted(level.getName(), 4);
 			default -> COLORED_LEVEL_FORMAT.formatted(level.getName(), 5);
 		};
+	}
+
+	@Override
+	public String getHead(Handler h){
+		final Instant i = Instant.now();
+		return inConsole ? super.getHead(h) : LOG_HEAD_FORMAT.formatted(
+			i.toEpochMilli(), i.getNano()
+		);
+	}
+	@Override
+	public String getTail(Handler h){
+		final Instant i = Instant.now();
+		return inConsole ? super.getTail(h) : LOG_TAIL_FORMAT.formatted(
+			i.toEpochMilli(), i.getNano()
+		);
 	}
 
 	// FUNCTIONS
@@ -57,9 +75,10 @@ public class AppLoggerFormatter extends Formatter{
 
 		return LOG_FORMAT.formatted(
 			record.getSequenceNumber(),
-			record.getMillis(),
+			record.getInstant().toEpochMilli(),
+			record.getInstant().getNano(),
 			record.getLongThreadID(),
-			colorized ? getColoredLevel(record.getLevel()) : record.getLevel(),
+			inConsole ? getColoredLevel(record.getLevel()) : record.getLevel(),
 			msg.toString()
 		);
 	}
