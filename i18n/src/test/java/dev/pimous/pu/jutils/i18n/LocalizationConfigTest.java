@@ -25,8 +25,8 @@ class LocalizationConfigTest{
 		assertEquals(Locale.of("en", "FR"),
 			tc.getSection(LocalizationConfig.class).getLocale()
 		);
-		assertEquals(TimeZone.getTimeZone(ZoneOffset.UTC.getId()),
-			tc.getSection(LocalizationConfig.class).getTimeZone()
+		assertEquals(ZoneId.of("UTC"),
+			tc.getSection(LocalizationConfig.class).getTimeZone().toZoneId()
 		);
 
 		system.putAll(getProperties("config/localized.properties"));
@@ -34,8 +34,8 @@ class LocalizationConfigTest{
 		assertEquals(Locale.of("fr", "CH"),
 			tc.getSection(LocalizationConfig.class).getLocale()
 		);
-		assertEquals(TimeZone.getTimeZone(ZoneId.of("CET")),
-			tc.getSection(LocalizationConfig.class).getTimeZone()
+		assertEquals(ZoneId.of("CET"),
+			tc.getSection(LocalizationConfig.class).getTimeZone().toZoneId()
 		);
 	}
 
