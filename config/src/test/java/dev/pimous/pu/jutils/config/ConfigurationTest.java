@@ -32,6 +32,10 @@ class ConfigurationTest{
 			getProperties("config/system.properties"), env
 		);
 
+		assertEquals(ServerConfig.file, config.getFile());
+
+		assertTrue(config.hasSection(ConfigSectionTest.TestConfig.class));
+		assertFalse(config.hasSection(DummyConfig.class));
 		assertDoesNotThrow(
 			() -> config.getSection(ConfigSectionTest.TestConfig.class)
 		);

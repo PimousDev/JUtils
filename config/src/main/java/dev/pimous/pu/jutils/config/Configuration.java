@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  */
 public abstract class Configuration{
 
-	public static final String COMMENT_FORMAT = "%s - Saved at %s";
 	public static final char SECTION_DELIMITER = '.';
 	public static final Pattern PROPERTY_PATTERN = Pattern.compile(
 		"^(?<section>[^.]+)\\.(?<property>.+)$"
@@ -51,6 +50,14 @@ public abstract class Configuration{
 	}
 
 	// GETTERS
+	public File getFile(){ return file; }
+	public <S extends ConfigSection> boolean hasSection(
+		final Class<S> sectionClass
+	){
+		return sections.values().stream()
+			.filter(sectionClass::isInstance)
+			.findAny().isPresent();
+	}
 	public <S extends ConfigSection> S getSection(final Class<S> sectionClass){
 		return sections.values().stream()
 			.filter(sectionClass::isInstance)
