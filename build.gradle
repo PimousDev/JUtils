@@ -64,7 +64,7 @@ project(":config"){
 	}
 }
 project(":i18n"){
-	description = configDescription
+	description = i18nDescription
 
 	apply plugin: "java-library"
 
@@ -74,7 +74,7 @@ project(":i18n"){
 	}
 }
 project(":logger"){
-	description = configDescription
+	description = loggerDescription
 
 	apply plugin: "java-library"
 
@@ -85,7 +85,7 @@ project(":logger"){
 }
 
 project(":app"){
-	description = configDescription
+	description = appDescription
 
 	apply plugin: "java-library"
 
