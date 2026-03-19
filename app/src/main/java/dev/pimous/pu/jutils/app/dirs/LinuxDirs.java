@@ -15,8 +15,6 @@ public class LinuxDirs extends AbstractDirs{
 	private static final String GLOBAL_SHARE_DIR = ".local/share";
 	private static final String GLOBAL_CACHE_DIR = ".cache";
 
-	private static final String TEMP_DIR_PROP_NAME = "java.io.tmpdir";
-
 	public LinuxDirs(final Configuration config){
 		super(config);
 	}
@@ -54,7 +52,7 @@ public class LinuxDirs extends AbstractDirs{
 
 	@Override
 	public File getGlobalTempDir(){
-		return new File(getConfig().getEnv(TEMP_DIR_PROP_NAME, TEMP_DIR));
+		return getConfig().getSystem().getTmpDir();
 	}
 	@Override
 	public File getTempDir(final String identifier){
