@@ -39,6 +39,26 @@ class LocalizationConfigTest{
 		);
 	}
 
+	@Test
+	void integrity(){
+		final LocalizationConfig lc = new LocalizationConfig(
+			new SystemConfig(getProperties("config/minimal.properties"))
+		);
+
+		assertEquals(lc.getLocale(),
+			lc.getParser("locale").apply(
+				lc.getFormatter("locale").apply(lc.getLocale()).toString()
+			)
+		);
+		assertEquals(lc.getTimeZone().toZoneId(),
+			lc.getParser("timezone").apply(
+				lc.getFormatter("timezone")
+					.apply(lc.getTimeZone().toZoneId())
+					.toString()
+			)
+		);
+	}
+
 	// FUNCTIONS
 	private Properties getProperties(String resource){
 		final Properties props = new Properties();

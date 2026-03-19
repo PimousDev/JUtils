@@ -1,13 +1,11 @@
 package dev.pimous.pu.jutils.i18n;
 
+import dev.pimous.pu.jutils.base.Functions;
 import dev.pimous.pu.jutils.config.ConfigSection;
-import dev.pimous.pu.jutils.config.Configuration;
 import dev.pimous.pu.jutils.config.SystemConfig;
 
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.TimeZone;
 import java.util.function.Function;
 
@@ -43,6 +41,15 @@ public class LocalizationConfig extends ConfigSection{
 			case "locale" -> Locale::forLanguageTag;
 			case "timezone" -> ZoneId::of;
 			default -> super.getParser(property);
+		};
+	}
+	@Override
+	protected Function<Object, CharSequence> getFormatter(String property){
+		return switch(property){
+			case "locale" -> Functions.castFunction(Locale.class).andThen(
+				Locale::toLanguageTag
+			);
+			default -> super.getFormatter(property);
 		};
 	}
 
