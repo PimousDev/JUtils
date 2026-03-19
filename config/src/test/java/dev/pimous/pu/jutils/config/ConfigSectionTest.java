@@ -1,5 +1,6 @@
 package dev.pimous.pu.jutils.config;
 
+import dev.pimous.pu.jutils.base.Functions;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
@@ -70,7 +71,7 @@ class ConfigSectionTest{
 
 		props = tc.toProperties();
 		assertEquals(4, props.size());
-		assertEquals("F", props.getProperty("name"));
+		assertEquals("f", props.getProperty("name"));
 		assertEquals("20", props.getProperty("number"));
 		assertEquals("null", props.getProperty("version"));
 		assertEquals("test", props.getProperty("a"));
@@ -107,11 +108,20 @@ class ConfigSectionTest{
 
 		// GETTERS
 		@Override
-		protected Function<? super String, ?> getParser(String property){
+		protected Function<String, ?> getParser(String property){
 			return switch(property){
 				case "number" -> Integer::parseInt;
 				case "version" -> Version::new;
 				default -> super.getParser(property);
+			};
+		}
+		@Override
+		protected Function<Object, CharSequence> getFormatter(String property){
+			return switch(property){
+				case "name" -> Functions.castFunction(String.class).andThen(
+					String::toLowerCase
+				);
+				default -> super.getFormatter(property);
 			};
 		}
 	}

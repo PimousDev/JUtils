@@ -22,7 +22,7 @@ public abstract class ConfigSection{
 	}
 	private static String getPropertyName(final Field field){
 		final ConfigField cf = field.getAnnotation(ConfigField.class);
-		return cf.property() != null && cf.property().length() != 0 ?
+		return cf.property() != null && !cf.property().isEmpty() ?
 			cf.property() : field.getName();
 	}
 
@@ -47,8 +47,13 @@ public abstract class ConfigSection{
 		return get(property).map(String.class::cast);
 	}
 	
-	protected Function<? super String, ?> getParser(final String property){
+	protected Function<String, ?> getParser(final String property){
 		return Function.identity();
+	}
+	protected Function<Object, CharSequence> getFormatter(
+		final String property
+	){
+		return String::valueOf;
 	}
 
 	// SETTERS
@@ -96,10 +101,11 @@ public abstract class ConfigSection{
 		final Properties props = new Properties();
 
 		getFields().filter(filter).forEach(f -> {
+			final String p = getPropertyName(f);
 			try{
 				f.setAccessible(true); // BUG: Is this can fail?
 				props.setProperty(getPropertyName(f),
-					String.valueOf(f.get(this))
+					getFormatter(p).apply(f.get(this)).toString()
 				);
 			}catch(Exception e){
 				throw new ConfigImplementationException(

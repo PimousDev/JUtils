@@ -38,7 +38,7 @@ public class LocalizationConfig extends ConfigSection{
 
 	// GETTERS
 	@Override
-	protected Function<? super String, ?> getParser(final String property){
+	protected Function<String, ?> getParser(final String property){
 		return switch(property){
 			case "locale" -> Locale::forLanguageTag;
 			case "timezone" -> ZoneId::of;

@@ -115,7 +115,7 @@ class ConfigurationTest{
 
 		props = config.toProperties();
 		assertEquals(6, props.size());
-		assertEquals("F", props.getProperty("test.name"));
+		assertEquals("f", props.getProperty("test.name"));
 		assertEquals("20", props.getProperty("test.number"));
 		assertEquals("null", props.getProperty("test.version"));
 		assertEquals("test", props.getProperty("test.a"));
@@ -182,7 +182,7 @@ class ConfigurationTest{
 
 		// GETTERS
 		@Override
-		protected Function<? super String, ?> getParser(String property){
+		protected Function<String, ?> getParser(String property){
 			return switch(property){
 				case "host" -> this::parseHost;
 				case "port" -> this::parsePort;
