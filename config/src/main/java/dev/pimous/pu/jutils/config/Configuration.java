@@ -241,11 +241,8 @@ public abstract class Configuration{
 		}
 
 		// Saves configuration
-		// FIXME: Handle user timezone.
 		try(FileWriter fos = new FileWriter(file, Charset.defaultCharset())){
-			props.store(fos, COMMENT_FORMAT.formatted(comments,
-				OffsetDateTime.now(ZoneOffset.UTC)
-			));
+			props.store(fos, comments);
 		}catch(final IOException e){
 			throw new IOException(
 				"Cannot write configuration file at %s;".formatted(file), e
