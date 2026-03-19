@@ -15,6 +15,8 @@ import java.util.stream.Stream;
  */
 public abstract class ConfigSection{
 
+	public ConfigSection(){}
+
 	// GETTERS
 	private final Stream<Field> getFields(){
 		return Arrays.stream(getClass().getDeclaredFields())

@@ -1,4 +1,4 @@
-package dev.pimous.pu.jutils.config.dirs;
+package dev.pimous.pu.jutils.app.dirs;
 
 import dev.pimous.pu.jutils.config.Configuration;
 
@@ -10,7 +10,7 @@ import java.io.File;
  */
 public class LocalDirs extends AbstractDirs{
 
-	public LocalDirs(Configuration config){
+	public LocalDirs(final Configuration config){
 		super(config);
 	}
 

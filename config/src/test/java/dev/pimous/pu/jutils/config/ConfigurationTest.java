@@ -7,7 +7,6 @@ import java.io.*;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -68,12 +67,6 @@ class ConfigurationTest{
 			config.getEnv("java.io.tmpdir", "test")
 		);
 		assertEquals("test", config.getEnv("undefined", "test"));
-
-		assertEquals(new File("config"), config.getConfigDir(""));
-		assertEquals(new File("data"), config.getDataDir(""));
-		assertEquals(new File("cache"), config.getCacheDir(""));
-		assertEquals(new File("tmp"), config.getTempDir(""));
-		assertEquals(new File("log"), config.getLogDir(""));
 	}
 
 	@Test

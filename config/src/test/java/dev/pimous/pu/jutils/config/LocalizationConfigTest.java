@@ -1,17 +1,13 @@
-package dev.pimous.pu.jutils.i18n;
+package dev.pimous.pu.jutils.config;
 
-import dev.pimous.pu.jutils.config.Configuration;
-import dev.pimous.pu.jutils.config.SystemConfig;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +15,7 @@ class LocalizationConfigTest{
 
 	@Test
 	void getters(){
-		final Properties system = getProperties("config/minimal.properties");
+		final Properties system = getProperties("config/system.properties");
 
 		TestConfig tc = new TestConfig(system);
 		assertEquals(Locale.of("en", "FR"),
@@ -42,7 +38,7 @@ class LocalizationConfigTest{
 	@Test
 	void integrity(){
 		final LocalizationConfig lc = new LocalizationConfig(
-			new SystemConfig(getProperties("config/minimal.properties"))
+			new SystemConfig(getProperties("config/system.properties"))
 		);
 
 		assertEquals(lc.getLocale(),

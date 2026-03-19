@@ -1,4 +1,4 @@
-package dev.pimous.pu.jutils.config.dirs;
+package dev.pimous.pu.jutils.app.dirs;
 
 import dev.pimous.pu.jutils.config.Configuration;
 
@@ -17,7 +17,7 @@ public class LinuxDirs extends AbstractDirs{
 
 	private static final String TEMP_DIR_PROP_NAME = "java.io.tmpdir";
 
-	public LinuxDirs(Configuration config){
+	public LinuxDirs(final Configuration config){
 		super(config);
 	}
 

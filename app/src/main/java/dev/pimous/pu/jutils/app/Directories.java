@@ -1,7 +1,8 @@
-package dev.pimous.pu.jutils.config;
+package dev.pimous.pu.jutils.app;
 
-import dev.pimous.pu.jutils.config.dirs.LinuxDirs;
-import dev.pimous.pu.jutils.config.dirs.LocalDirs;
+import dev.pimous.pu.jutils.app.dirs.LinuxDirs;
+import dev.pimous.pu.jutils.app.dirs.LocalDirs;
+import dev.pimous.pu.jutils.config.Configuration;
 
 import java.io.File;
 

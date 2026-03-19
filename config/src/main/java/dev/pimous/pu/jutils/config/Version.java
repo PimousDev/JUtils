@@ -119,7 +119,7 @@ public final class Version{
 				);
 
 			this(
-				(char) m.group("identifier").charAt(0),
+				m.group("identifier").charAt(0),
 				(byte) Integer.parseUnsignedInt(m.group("number"))
 			);
 		}

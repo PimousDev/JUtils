@@ -1,8 +1,6 @@
-package dev.pimous.pu.jutils.i18n;
+package dev.pimous.pu.jutils.config;
 
 import dev.pimous.pu.jutils.base.Functions;
-import dev.pimous.pu.jutils.config.ConfigSection;
-import dev.pimous.pu.jutils.config.SystemConfig;
 
 import java.time.ZoneId;
 import java.util.Locale;

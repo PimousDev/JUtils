@@ -1,7 +1,7 @@
-package dev.pimous.pu.jutils.config.dirs;
+package dev.pimous.pu.jutils.app.dirs;
 
+import dev.pimous.pu.jutils.app.Directories;
 import dev.pimous.pu.jutils.config.Configuration;
-import dev.pimous.pu.jutils.config.Directories;
 
 import java.io.File;
 import java.nio.file.Path;
