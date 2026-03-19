@@ -76,13 +76,13 @@ class JULAdapterTest{
 		l.logO(Level.FATAL, new A());
 		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
 		assertEquals(
-			"dev.pimous.pu.jutils.logger.JULAdapterTest$A(892555958){l=\"l\"}",
+			"dev.pimous.pu.jutils.logger.JULAdapterTest$A(1){l=\"l\"}",
 			bh.lastRecord.getMessage()
 		);
 		l.logO(Level.FATAL, new A(), "Ooooh there is a %d problem!", 24);
 		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
 		assertEquals(
-			"Ooooh there is a 24 problem!\ndev.pimous.pu.jutils.logger.JULAdapterTest$A(1182908789){l=\"l\"}",
+			"Ooooh there is a 24 problem!\ndev.pimous.pu.jutils.logger.JULAdapterTest$A(1){l=\"l\"}",
 			bh.lastRecord.getMessage()
 		);
 	}
@@ -116,5 +116,11 @@ class JULAdapterTest{
 
 		private static String f = "f";
 		private String l = "l";
+
+		// FUNCTIONS
+		@Override
+		public int hashCode(){
+			return l.length();
+		}
 	}
 }
