@@ -1,3 +1,19 @@
+// Inspired from: https://www.pushing-pixels.org/2021/11/30/gradle-copying-all-multi-module-dependencies-to-a-local-folder.html
+task flatLibJars(type: Copy){
+	group = "Build"
+	description = "Copy all library's jars from every subprojects to one folder."
+	from{
+		subprojects.findAll{ it.plugins.hasPlugin("java-library") }
+			.collect{ it.tasks.jar }
+	}
+	into layout.buildDirectory.dir("libs")
+}
+task clean(type: Delete) {
+	group = "Build"
+	description = "Deletes the build directory."
+	delete rootProject.buildDir
+}
+
 subprojects{
 	apply plugin: "java"
 
