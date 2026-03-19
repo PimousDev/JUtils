@@ -41,20 +41,20 @@ class IntrospectiveStringifierTest{
 	@Test
 	void instances(){
 		assertEquals(
-			"dev.pimous.pu.jutils.base.IntrospectiveStringifierTest$A(150138649){aa=0.0}",
+			"dev.pimous.pu.jutils.base.IntrospectiveStringifierTest$A(52){aa=0.0}",
 			IntrospectiveStringifier.fromPublics(new A())
 		);
 		assertEquals(
-			"dev.pimous.pu.jutils.base.IntrospectiveStringifierTest$C(593415583){cf=\"test\";aa=0.0}",
+			"dev.pimous.pu.jutils.base.IntrospectiveStringifierTest$C(1612){cf=\"test\";aa=0.0}",
 			IntrospectiveStringifier.fromPublics(new C())
 		);
 
 		assertEquals(
-			"dev.pimous.pu.jutils.base.IntrospectiveStringifierTest$A(540325452){aa=0.0;ac=20;micro=0.24}",
+			"dev.pimous.pu.jutils.base.IntrospectiveStringifierTest$A(52){aa=0.0;ac=20;micro=0.24}",
 			IntrospectiveStringifier.fromAll(new A())
 		);
 		assertEquals(
-			"dev.pimous.pu.jutils.base.IntrospectiveStringifierTest$C(1418555530){cf=\"test\";cb=null;cd=dev.pimous.pu.jutils.base.InternalException: There is no errors.}",
+			"dev.pimous.pu.jutils.base.IntrospectiveStringifierTest$C(1612){cf=\"test\";cb=null;cd=dev.pimous.pu.jutils.base.InternalException: There is no errors.}",
 			IntrospectiveStringifier.fromAll(new C())
 		);
 	}
@@ -68,6 +68,12 @@ class IntrospectiveStringifierTest{
 		protected byte ac = 20;
 		private static long ad;
 		private double micro = 0.24D;
+
+		// FUNCTIONS
+		@Override
+		public int hashCode(){
+			return af + ab + ac;
+		}
 	}
 	private static interface B{
 
@@ -82,5 +88,11 @@ class IntrospectiveStringifierTest{
 		protected static AtomicLong cc = new AtomicLong(31);
 		private InternalException cd = new InternalException("There is no errors.");
 		private static BadResourceException dvd;
+
+		// FUNCTIONS
+		@Override
+		public int hashCode(){
+			return (af + ab + ac)*cc.intValue();
+		}
 	}
 }
