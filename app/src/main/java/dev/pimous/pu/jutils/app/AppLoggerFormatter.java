@@ -12,11 +12,11 @@ import java.util.logging.*;
 public class AppLoggerFormatter extends Formatter{
 
 	private static final String LOG_HEAD_FORMAT
-		= "STARTED logging at %1$tY/%1$tm/%1$tdT%1$tT.%2$09d:";
+		= "STARTED logging at %1$tY/%1$tm/%1$tdT%1$tT.%2$09d:%n";
 	private static final String LOG_FORMAT
 		= "(%1$d - %2$tY/%2$tm/%2$tdT%2$tT.%3$09d){T:%4$d}[%5$s] %6$s%n";
 	private static final String LOG_TAIL_FORMAT
-		= "FINISHED logging at %1$tY/%1$tm/%1$tdT%1$tT.%2$09d.";
+		= "FINISHED logging at %1$tY/%1$tm/%1$tdT%1$tT.%2$09d.%n";
 	private static final String COLORED_LEVEL_FORMAT
 		= "\u001b[1;38;5;%2$dm%1$s\u001b[0m";
 
@@ -69,7 +69,7 @@ public class AppLoggerFormatter extends Formatter{
 			final PrintWriter pw = new PrintWriter(sw);
 			record.getThrown().printStackTrace(pw);
 			pw.close();
-			msg.append(sw.toString());
+			msg.append(sw);
 			msg.deleteCharAt(msg.length() - 1);
 		}
 
