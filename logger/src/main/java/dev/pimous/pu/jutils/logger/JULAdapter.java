@@ -19,7 +19,7 @@ public class JULAdapter implements Logger{
 	}
 
 	// FUNCTIONS
-	private java.util.logging.Level mapLevel(final Level level){
+	public static java.util.logging.Level mapLevel(final Level level){
 		return switch(level){
 			case FATAL, CRITICAL, ERROR -> java.util.logging.Level.SEVERE;
 			case WARNING -> java.util.logging.Level.WARNING;
