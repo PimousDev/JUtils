@@ -1,14 +1,4 @@
-// Inspired from: https://www.pushing-pixels.org/2021/11/30/gradle-copying-all-multi-module-dependencies-to-a-local-folder.html
-task flatLibJars(type: Copy){
-	group = "Build"
-	description = "Copy all library's jars from every subprojects to one folder."
-	from{
-		subprojects.findAll{ it.plugins.hasPlugin("java-library") }
-			.collect{ it.tasks.jar }
-	}
-	into layout.buildDirectory.dir("libs")
-}
-task clean(type: Delete) {
+tasks.register("clean", Delete){
 	group = "Build"
 	description = "Deletes the build directory."
 	delete rootProject.buildDir
@@ -20,10 +10,7 @@ subprojects{
 	group = projectGroup
 	version = projectVersion
 
-	java{
-		sourceCompatibility = sourceCompatibility
-	}
-	tasks.withType(JavaCompile){
+	tasks.withType(JavaCompile).configureEach{
 		options.compilerArgs.add("-Xlint:all")
 		options.compilerArgs.add("-Werror")
 		options.deprecation = true
@@ -32,13 +19,20 @@ subprojects{
 	repositories{
 		mavenCentral()
 	}
-
 	dependencies{
 		testImplementation platform("org.junit:junit-bom:5.10.0")
 		testImplementation "org.junit.jupiter:junit-jupiter"
 		testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 	}
 
+	jar{
+		doLast{
+			copy{
+				from jar
+				into rootProject.layout.buildDirectory.dir("libs")
+			}
+		}
+	}
 	tasks.named("test", Test){
 		useJUnitPlatform()
 
@@ -70,7 +64,6 @@ project(":i18n"){
 
 	dependencies{
 		api project(":base")
-		implementation project(":config")
 	}
 }
 project(":logger"){
@@ -80,7 +73,6 @@ project(":logger"){
 
 	dependencies{
 		api project(":base")
-		implementation project(":config")
 	}
 }
 
