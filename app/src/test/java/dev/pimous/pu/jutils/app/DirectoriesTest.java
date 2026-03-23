@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.io.Console;
 import java.io.File;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -63,12 +62,6 @@ class DirectoriesTest{
 
 		private static final I18n language = new I18n(Locale.FRENCH, List.of());
 
-		public TestApp(final int threads,
-			final PrintStream out,
-			final PrintStream err
-		){
-			super(threads, System.in, out, err);
-		}
 		public TestApp(final int threads){
 			super(threads);
 		}
@@ -86,7 +79,7 @@ class DirectoriesTest{
 	private static class DummyConfig extends Configuration{
 
 		public DummyConfig(final Properties system){
-			super(null, system);
+			super(system);
 		}
 	}
 }

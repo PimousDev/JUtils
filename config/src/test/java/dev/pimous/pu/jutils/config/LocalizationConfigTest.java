@@ -2,7 +2,6 @@ package dev.pimous.pu.jutils.config;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.InputStream;
 import java.time.ZoneId;
 import java.util.Locale;
@@ -75,8 +74,6 @@ class LocalizationConfigTest{
 	// INNER CLASSES
 	private static class TestConfig extends Configuration{
 
-		public static final File file = new File("server.properties");
-
 		{
 			addSection("localization", new LocalizationConfig(getSystem(),
 				DEFAULT_LOCALE, DEFAULT_ZONEID
@@ -84,12 +81,7 @@ class LocalizationConfigTest{
 		}
 
 		public TestConfig(final Properties system){
-			super(file, system);
-		}
-		public TestConfig(
-			final Properties system, final Map<String, String> env
-		){
-			super(file, system, env);
+			super(system);
 		}
 	}
 }

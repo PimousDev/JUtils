@@ -16,13 +16,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigurationTest{
 
+	public static final File FILE = new File("server.properties");
+
 	final Map<String, String> env = Map.of(
 		"java.io.tmpdir", "tmp/"
 	);
 
 	@BeforeEach
 	void deleteFile(){
-		ServerConfig.file.delete();
+		FILE.delete();
 	}
 
 	@Test
@@ -31,7 +33,9 @@ class ConfigurationTest{
 			getProperties("config/system.properties"), env
 		);
 
-		assertEquals(ServerConfig.file, config.getFile());
+		assertNull(config.getFile());
+		config.setFile(FILE);
+		assertEquals(FILE, config.getFile());
 
 		assertTrue(config.hasSection(ConfigSectionTest.TestConfig.class));
 		assertFalse(config.hasSection(DummyConfig.class));
@@ -44,20 +48,20 @@ class ConfigurationTest{
 		);
 
 		assertThrows(IllegalArgumentException.class,
-			() -> config.get("host").get()
+			() -> config.get("host").orElseThrow()
 		);
-		assertEquals("test", config.getString("test.a").get());
-		assertEquals("F", config.get("test.name").get());
-		assertEquals(20, config.get("test.number").get());
+		assertEquals("test", config.getString("test.a").orElseThrow());
+		assertEquals("F", config.get("test.name").orElseThrow());
+		assertEquals(20, config.get("test.number").orElseThrow());
 		assertThrows(ClassCastException.class,
 			() -> config.getString("test.number")
 		);
 		assertEquals(InetAddress.getLoopbackAddress(),
-			config.get("socket.host").get()
+			config.get("socket.host").orElseThrow()
 		);
-		assertEquals((short) 31000, config.get("socket.port").get());
+		assertEquals((short) 31000, config.get("socket.port").orElseThrow());
 		assertThrows(NoSuchElementException.class,
-			() -> config.get("undefined.l").get()
+			() -> config.get("undefined.l").orElseThrow()
 		);
 
 		assertEquals("GillardeauOS", config.getSystem().getOSName());
@@ -82,15 +86,17 @@ class ConfigurationTest{
 		final ConfigSectionTest.TestConfig tc = config.getSection(
 			ConfigSectionTest.TestConfig.class
 		);
-		assertEquals("A", tc.getString("name").get());
-		assertEquals(24, tc.get("number").get());
-		assertEquals("31.1.20-b.20", tc.get("version").get().toString());
-		assertEquals("test2", tc.get("a").get());
+		assertEquals("A", tc.getString("name").orElseThrow());
+		assertEquals(24, tc.get("number").orElseThrow());
+		assertEquals("31.1.20-b.20",
+			tc.get("version").orElseThrow().toString()
+		);
+		assertEquals("test2", tc.get("a").orElseThrow());
 		final SocketConfig sc = config.getSection(SocketConfig.class);
 		assertEquals(Inet4Address.ofLiteral("84.234.17.190"),
-			sc.get("host").get()
+			sc.get("host").orElseThrow()
 		);
-		assertEquals((short) 31012, sc.get("port").get());
+		assertEquals((short) 31012, sc.get("port").orElseThrow());
 
 		assertDoesNotThrow(() -> config.load(
 			ClassLoader.getSystemResourceAsStream(
@@ -126,11 +132,15 @@ class ConfigurationTest{
 			getProperties("config/system.properties"), env
 		);
 
-		assertTrue(!ServerConfig.file.exists());
+		assertThrows(RuntimeException.class, () -> config.save(""));
+
+		config.setFile(FILE);
+
+		assertFalse(FILE.exists());
 		assertDoesNotThrow(() -> config.save(""));
-		assertTrue(ServerConfig.file.exists());
-		assertTrue(ServerConfig.file.length() > 0);
-		try(FileReader fis = new FileReader(ServerConfig.file)){
+		assertTrue(FILE.exists());
+		assertTrue(FILE.length() > 0);
+		try(FileReader fis = new FileReader(FILE)){
 			final Properties props = new Properties();
 			props.load(fis);
 			assertEquals(6, props.size());
@@ -139,10 +149,10 @@ class ConfigurationTest{
 		config.getSection(ConfigSectionTest.TestConfig.class).number = 124;
 		config.getSection(SocketConfig.class).port = 31012;
 
-		final long oldLength = ServerConfig.file.length();
+		final long oldLength = FILE.length();
 		assertDoesNotThrow(() -> config.save(""));
-		assertEquals(oldLength + 1, ServerConfig.file.length());
-		try(FileReader fis = new FileReader(ServerConfig.file)){
+		assertEquals(oldLength + 1, FILE.length());
+		try(FileReader fis = new FileReader(FILE)){
 			final Properties props = new Properties();
 			props.load(fis);
 
@@ -193,12 +203,12 @@ class ConfigurationTest{
 		}
 		private short parsePort(final String value){
 			try{
-				Integer port = Integer.parseInt(value);
+				int port = Integer.parseInt(value);
 
 				if(port < 0 || port >= 65535)
 					throw new NumberFormatException();
 
-				return port.shortValue();
+				return (short) port;
 			}catch(final NumberFormatException e){
 				throw new IllegalArgumentException(e);
 			}
@@ -208,20 +218,18 @@ class ConfigurationTest{
 
 	private static class ServerConfig extends Configuration{
 
-		public static final File file = new File("server.properties");
-
 		{
 			addSection("test", new ConfigSectionTest.TestConfig());
 			addSection("socket", new SocketConfig());
 		}
 
 		public ServerConfig(final Properties system){
-			super(file, system);
+			super(system);
 		}
 		public ServerConfig(
 			final Properties system, final Map<String, String> env
 		){
-			super(file, system, env);
+			super(system, env);
 		}
 	}
 }

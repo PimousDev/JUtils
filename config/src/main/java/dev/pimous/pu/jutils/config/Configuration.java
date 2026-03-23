@@ -19,20 +19,19 @@ public abstract class Configuration{
 		"^(?<section>[^.]+)\\.(?<property>.+)$"
 	);
 
-	private final File file;
+	private File file = null;
 	private final Map<String, ConfigSection> sections;
 	private final SystemConfig system;
 	private final Properties env = new Properties();
 
-	public Configuration(final File file, final Properties system){
-		this.file = file;
+	public Configuration(final Properties system){
 		this.sections = new HashMap<>();
 		this.system = new SystemConfig(system);
 	}
-	public Configuration(final File file,
+	public Configuration(
 		final Properties system, final Map<String, String> env
 	){
-		this(file, system);
+		this(system);
 
 		this.env.putAll(env);
 	}
@@ -43,14 +42,13 @@ public abstract class Configuration{
 		final Class<S> sectionClass
 	){
 		return sections.values().stream()
-			.filter(sectionClass::isInstance)
-			.findAny().isPresent();
+			.anyMatch(sectionClass::isInstance);
 	}
 	public <S extends ConfigSection> S getSection(final Class<S> sectionClass){
 		return sections.values().stream()
 			.filter(sectionClass::isInstance)
 			.map(sectionClass::cast)
-			.findFirst().get();
+			.findFirst().orElseThrow();
 	}
 	public Optional<Object> get(final String property){
 		final Matcher m = PROPERTY_PATTERN.matcher(property);
@@ -62,7 +60,7 @@ public abstract class Configuration{
 			);
 
 		return Optional.ofNullable(sections.get(m.group("section")))
-			.map(s -> s.get(m.group("property")).get());
+			.map(s -> s.get(m.group("property")).orElseThrow());
 	}
 	public Optional<String> getString(final String property){
 		return get(property).map(String.class::cast);
@@ -73,6 +71,9 @@ public abstract class Configuration{
 	}
 
 	// SETTERS
+	public void setFile(final File file){
+		this.file = file;
+	}
 	protected void addSection(final String name, final ConfigSection section){
 		if(name.contains(String.valueOf(SECTION_DELIMITER)))
 			throw new IllegalArgumentException(
@@ -100,9 +101,11 @@ public abstract class Configuration{
 
 	// Loading
 	public void load() throws
-		ConfigPropertyException, IllegalArgumentException,
-		FileNotFoundException, IOException
+		ConfigPropertyException, IllegalArgumentException, IOException
 	{
+		if(file == null)
+			throw new RuntimeException("file isn't defined;");
+
 		load(file);
 	}
 
@@ -117,7 +120,7 @@ public abstract class Configuration{
 				.filter(p -> p.startsWith(prefix))
 				.collect(Collectors.toMap(
 					p -> p.substring(prefix.length()),
-					p -> properties.getProperty(p)
+					properties::getProperty
 				))
 			);
 
@@ -140,8 +143,7 @@ public abstract class Configuration{
 		load(props);
 	}
 	private void load(final File file) throws
-		ConfigPropertyException, IllegalArgumentException,
-		FileNotFoundException, IOException
+		ConfigPropertyException, IllegalArgumentException, IOException
 	{
 		try(FileInputStream fis = new FileInputStream(file)){
 			load(fis);
@@ -164,7 +166,7 @@ public abstract class Configuration{
 	}
 
 	// FUNCTIONS
-	private final Properties toProperties(
+	private Properties toProperties(
 		Function<ConfigSection, Properties> getter
 	){
 		final Properties props = new Properties();
