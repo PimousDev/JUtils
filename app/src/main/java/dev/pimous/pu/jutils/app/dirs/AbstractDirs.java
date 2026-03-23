@@ -27,7 +27,7 @@ public abstract class AbstractDirs implements Directories{
 	// GETTERS
 	protected Configuration getConfig(){ return config; }
 	protected Path getHomeDir(){
-		return Path.of(config.getSystem().getHome());
+		return config.getSystem().getHome().toPath();
 	}
 
 	// SETTERS

@@ -61,7 +61,7 @@ class ConfigurationTest{
 		);
 
 		assertEquals("GillardeauOS", config.getSystem().getOSName());
-		assertEquals(".", config.getSystem().getHome());
+		assertEquals(new File("."), config.getSystem().getHome());
 
 		assertEquals(env.get("java.io.tmpdir"),
 			config.getEnv("java.io.tmpdir", "test")

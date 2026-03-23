@@ -16,8 +16,10 @@ public final class SystemConfig extends ConfigSection{
 	@ConfigField(property="os.name", mandatory=true)
 	private String osName;
 
+	@ConfigField(property="user.dir", mandatory=true)
+	private File workingDir;
 	@ConfigField(property="user.home", mandatory=true)
-	private String home;
+	private File home;
 	@ConfigField(property="user.language")
 	private String language;
 	@ConfigField(property="user.country")
@@ -40,14 +42,15 @@ public final class SystemConfig extends ConfigSection{
 	@Override
 	protected Function<String, ?> getParser(String property){
 		return switch(property){
-			case "java.io.tmpdir" -> File::new;
+			case "user.dir", "user.home", "java.io.tmpdir" -> File::new;
 			default -> super.getParser(property);
 		};
 	}
 
 	public String getOSName(){ return osName; }
 
-	public String getHome(){ return home; }
+	public File getWorkingDir(){ return workingDir; }
+	public File getHome(){ return home; }
 	public Optional<String> getLanguage(){
 		return Optional.ofNullable(language);
 	}
