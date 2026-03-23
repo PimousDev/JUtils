@@ -13,22 +13,21 @@ import java.util.function.Function;
  */
 public class LocalizationConfig extends ConfigSection{
 
-	private static final String DEFAULT_LANGUAGE = "en";
-	private static final String DEFAULT_COUNTRY = "FR";
-	private static final String DEFAULT_TIMEZONE = ZoneId.of("UTC").getId();
-
 	@ConfigField(property = "locale")
-	private Locale locale;
+	private final Locale locale;
 	@ConfigField(property = "timezone")
-	private ZoneId zoneId;
+	private final ZoneId zoneId;
 
-	public LocalizationConfig(final SystemConfig system){
+	public LocalizationConfig(final SystemConfig system,
+		final Locale defaultLocale,
+		final ZoneId defaultZone
+	){
 		locale = Locale.of(
-			system.getLanguage().orElse(DEFAULT_LANGUAGE),
-			system.getCountry().orElse(DEFAULT_COUNTRY)
+			system.getLanguage().orElse(defaultLocale.getLanguage()),
+			system.getCountry().orElse(defaultLocale.getCountry())
 		);
 		zoneId = ZoneId.of(
-			system.getTimezone().orElse(DEFAULT_TIMEZONE)
+			system.getTimezone().orElse(defaultZone.getId())
 		);
 	}
 

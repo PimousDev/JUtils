@@ -13,15 +13,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LocalizationConfigTest{
 
+	private static final Locale DEFAULT_LOCALE = Locale.of("en", "FR");
+	private static final ZoneId DEFAULT_ZONEID = ZoneId.of("UTC");
+
 	@Test
 	void getters(){
 		final Properties system = getProperties("config/system.properties");
 
 		TestConfig tc = new TestConfig(system);
-		assertEquals(Locale.of("en", "FR"),
+		assertEquals(DEFAULT_LOCALE,
 			tc.getSection(LocalizationConfig.class).getLocale()
 		);
-		assertEquals(ZoneId.of("UTC"),
+		assertEquals(DEFAULT_ZONEID,
 			tc.getSection(LocalizationConfig.class).getTimeZone().toZoneId()
 		);
 
@@ -38,7 +41,8 @@ class LocalizationConfigTest{
 	@Test
 	void integrity(){
 		final LocalizationConfig lc = new LocalizationConfig(
-			new SystemConfig(getProperties("config/system.properties"))
+			new SystemConfig(getProperties("config/system.properties")),
+			DEFAULT_LOCALE, DEFAULT_ZONEID
 		);
 
 		assertEquals(lc.getLocale(),
@@ -74,7 +78,9 @@ class LocalizationConfigTest{
 		public static final File file = new File("server.properties");
 
 		{
-			addSection("localization", new LocalizationConfig(getSystem()));
+			addSection("localization", new LocalizationConfig(getSystem(),
+				DEFAULT_LOCALE, DEFAULT_ZONEID
+			));
 		}
 
 		public TestConfig(final Properties system){
