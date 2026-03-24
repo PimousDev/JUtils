@@ -57,9 +57,10 @@ public class AppLoggerFormatter extends Formatter{
 	// FUNCTIONS
 	@Override
 	public String format(LogRecord record){
-		final StringBuilder msg = new StringBuilder(
-			record.getMessage().formatted(record.getParameters())
-		);
+		final StringBuilder msg = new StringBuilder();
+
+		if(record.getMessage() != null)
+			msg.append(record.getMessage().formatted(record.getParameters()));
 
 		if(record.getThrown() != null){
 			if(!msg.isEmpty())

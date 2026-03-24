@@ -40,10 +40,24 @@ class AppLoggerFormatterTest{
 			\tat dev\\.pimous\\.App\\.run\\(App\\.java:5\\)
 			"""
 		));
+		lr.setMessage(null);
+		assertTrue(f.format(lr).matches(
+			"""
+			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[SEVERE] java\\.io\\.FileNotFoundException
+			\tat dev\\.pimous\\.App\\.run\\(App\\.java:5\\)
+			"""
+		));
 
 		f = new AppLoggerFormatter(true);
 		assertTrue(f.getHead(new StreamHandler()).isEmpty());
 		assertTrue(f.getTail(new StreamHandler()).isEmpty());
+		assertTrue(f.format(lr).matches(
+			"""
+			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mSEVERE\u001b\\[0m] java\\.io\\.FileNotFoundException
+			\tat dev\\.pimous\\.App\\.run\\(App\\.java:5\\)
+			"""
+		));
+		lr.setMessage("test");
 		assertTrue(f.format(lr).matches(
 			"""
 			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mSEVERE\u001b\\[0m] test
