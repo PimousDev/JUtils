@@ -1,0 +1,5 @@
+plugins{
+	id("jutils.java-library")
+}
+
+description = baseDescription

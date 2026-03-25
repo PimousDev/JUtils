@@ -1,0 +1,9 @@
+plugins{
+	id("jutils.java-library")
+}
+
+description = i18nDescription
+
+dependencies{
+	api project(":base")
+}

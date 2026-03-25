@@ -1,0 +1,9 @@
+plugins{
+	id("jutils.java-library")
+}
+
+description = loggerDescription
+
+dependencies{
+	api project(":base")
+}

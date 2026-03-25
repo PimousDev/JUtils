@@ -1,0 +1,35 @@
+plugins{
+	id("java-library")
+}
+
+group = projectGroup
+version = projectVersion
+
+tasks.withType(JavaCompile).configureEach{
+	options.compilerArgs.add("-Xlint:all")
+	options.compilerArgs.add("-Werror")
+	options.deprecation = true
+}
+
+repositories{
+	mavenCentral()
+}
+dependencies{
+	testImplementation platform("org.junit:junit-bom:5.10.0")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.withType(Test).configureEach{
+	useJUnitPlatform()
+	maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+}
+
+jar{
+	doLast{
+		copy{
+			from jar
+			into rootProject.layout.buildDirectory.dir("libs")
+		}
+	}
+}
