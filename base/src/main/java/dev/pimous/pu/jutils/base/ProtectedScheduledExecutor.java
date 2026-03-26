@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * @author APG-Gillardeau
+ * @author Xibitol
  * @since 1.0.0
  */
 public class ProtectedScheduledExecutor implements ScheduledExecutorService{
