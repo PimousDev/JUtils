@@ -24,7 +24,8 @@ class ConfigurationTest{
 
 	@BeforeEach
 	void deleteFile(){
-		FILE.delete();
+		if(FILE.exists() && !FILE.delete())
+			throw new RuntimeException();
 	}
 
 	@Test
@@ -66,6 +67,7 @@ class ConfigurationTest{
 
 		assertEquals("GillardeauOS", config.getSystem().getOSName());
 		assertEquals(new File("."), config.getSystem().getHome());
+		assertEquals(new File("."), config.getSystem().getWorkingDir());
 
 		assertEquals(env.get("java.io.tmpdir"),
 			config.getEnv("java.io.tmpdir", "test")
@@ -163,6 +165,7 @@ class ConfigurationTest{
 	}
 
 	// FUNCTIONS
+	@SuppressWarnings("SameParameterValue")
 	private Properties getProperties(String resource){
 		final Properties props = new Properties();
 

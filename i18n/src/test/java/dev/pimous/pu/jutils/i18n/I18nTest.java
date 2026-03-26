@@ -3,7 +3,7 @@ package dev.pimous.pu.jutils.i18n;
 import dev.pimous.pu.jutils.base.BadResourceException;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -33,7 +33,7 @@ class I18nTest{
 		final I18n i18n = new I18n(Locale.of("en"), List.of("test"));
 
 		assertEquals(Locale.of("en", "FR", "Linux"),
-			i18n.load(Locale.of("en", "FR", "Linux"), Charset.forName("UTF-8"))
+			i18n.load(Locale.of("en", "FR", "Linux"), StandardCharsets.UTF_8)
 		);
 		assertEquals(Locale.of("en", "FR", "Linux"),
 			i18n.getBundle().getLocale()
@@ -59,7 +59,7 @@ class I18nTest{
 		final I18n erroneous = new I18n(Locale.of("en"), List.of("undefined"));
 		assertThrows(BadResourceException.class,
 			() -> erroneous.load(
-				Locale.of("en", "FR", "Linux"), Charset.forName("UTF-8")
+				Locale.of("en", "FR", "Linux"), StandardCharsets.UTF_8
 			)
 		);
 	}

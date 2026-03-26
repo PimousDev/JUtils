@@ -11,13 +11,7 @@ public class ConfigException extends Exception{
 	@Serial
 	private static final long serialVersionUID = 7247375025255609137L;
 
-	public ConfigException(Throwable cause){
-		super(cause);
-	}
-	public ConfigException(String message, Throwable cause){
-		super(message, cause);
-	}
-	protected ConfigException(String message){
+	public ConfigException(String message){
 		super(message);
 	}
 }

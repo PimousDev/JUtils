@@ -40,6 +40,7 @@ public class LocalizationConfig extends ConfigSection{
 			default -> super.getParser(property);
 		};
 	}
+	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	@Override
 	protected Function<Object, CharSequence> getFormatter(String property){
 		return switch(property){

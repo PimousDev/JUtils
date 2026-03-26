@@ -3,7 +3,7 @@ package dev.pimous.pu.jutils.config;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Stricter https://semver.org/.
+/** Stricter <a href="https://semver.org/">https://semver.org/</a>.
  * @author APG-Gillardeau
  * @since 1.0.0
  */

@@ -4,11 +4,6 @@ import dev.pimous.pu.jutils.base.Functions;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.function.Function;
@@ -23,10 +18,12 @@ class ConfigSectionTest{
 
 		assertEquals(Function.identity(), tc.getParser("a"));
 
-		assertEquals("test", tc.getString("a").get());
-		assertThrows(NoSuchElementException.class, () -> tc.get("l").get());
-		assertEquals("F", tc.get("name").get());
-		assertEquals(20, tc.get("number").get());
+		assertEquals("test", tc.getString("a").orElseThrow());
+		assertThrows(NoSuchElementException.class,
+			() -> tc.get("l").orElseThrow()
+		);
+		assertEquals("F", tc.get("name").orElseThrow());
+		assertEquals(20, tc.get("number").orElseThrow());
 		assertThrows(ClassCastException.class, () -> tc.getString("number"));
 	}
 
@@ -95,11 +92,12 @@ class ConfigSectionTest{
 	}
 
 	// INNER CLASSES
+	@SuppressWarnings("CanBeFinal")
 	public static class TestConfig extends ConfigSection{
 
 		@ConfigSection.ConfigField(property = "name")
 		private String f = "F";
-		@ConfigSection.ConfigField(readonly = false)
+		@ConfigSection.ConfigField(modifiable = true)
 		public int number = 20;
 		@ConfigSection.ConfigField(mandatory = true)
 		private Version version;
@@ -115,6 +113,7 @@ class ConfigSectionTest{
 				default -> super.getParser(property);
 			};
 		}
+		@SuppressWarnings("SwitchStatementWithTooFewBranches")
 		@Override
 		protected Function<Object, CharSequence> getFormatter(String property){
 			return switch(property){
@@ -124,11 +123,5 @@ class ConfigSectionTest{
 				default -> super.getFormatter(property);
 			};
 		}
-	}
-
-	private static class UninitializedConfig extends ConfigSection{
-
-		@ConfigSection.ConfigField
-		private Version a;
 	}
 }

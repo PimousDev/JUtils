@@ -40,7 +40,7 @@ public class ResourcePaths{
 			return this;
 		}
 		public Builder appendNode(final String filename){
-			if(this.path.length() > 0)
+			if(!this.path.isEmpty())
 				this.path += RESOURCE_DIRECTORY_SEPARATOR;
 
 			this.path += filename;

@@ -9,6 +9,7 @@ import java.util.function.Function;
  * @author Xibitol
  * @since 1.0.0
  */
+@SuppressWarnings("CanBeFinal")
 public class AppConfig extends ConfigSection{
 
 	@ConfigField(mandatory = true)
@@ -27,6 +28,7 @@ public class AppConfig extends ConfigSection{
 	public AppConfig(){}
 
 	// GETTERS
+	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	@Override
 	protected Function<String, ?> getParser(final String property){
 		return switch(property){

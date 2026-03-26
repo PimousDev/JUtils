@@ -12,6 +12,6 @@ public final class Functions{
 
 	// GETTERS
 	public static <T> Function<Object, T> castFunction(final Class<T> clazz){
-		return ((Function<Object, T>) clazz::cast);
+		return clazz::cast;
 	}
 }

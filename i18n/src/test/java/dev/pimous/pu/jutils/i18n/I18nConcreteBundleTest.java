@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
@@ -42,11 +43,11 @@ class I18nConcreteBundleTest{
 		Exception e = assertThrows(BadResourceException.class,
 			() -> b.loadSection("missing", Charset.defaultCharset())
 		);
-		assertTrue(e.getCause() instanceof FileNotFoundException);
+		assertInstanceOf(FileNotFoundException.class, e.getCause());
 		e = assertThrows(BadResourceException.class,
 			() -> b.loadSection("malformed", Charset.defaultCharset())
 		);
-		assertTrue(e.getCause() instanceof IllegalArgumentException);
+		assertInstanceOf(IllegalArgumentException.class, e.getCause());
 	}
 
 	@Test
@@ -57,8 +58,8 @@ class I18nConcreteBundleTest{
 		final I18nConcreteBundle bParent = new I18nConcreteBundle(
 			Locale.of("en", "FR", "Linux")
 		);
-		b.loadSection("bundle", Charset.forName("UTF-8"));
-		bParent.loadSection("parent", Charset.forName("UTF-8"));
+		b.loadSection("bundle", StandardCharsets.UTF_8);
+		bParent.loadSection("parent", StandardCharsets.UTF_8);
 
 		assertEquals("Hello my darling; Did you bring 3 pops?",
 			b.getSentence("a", "darling", 3)

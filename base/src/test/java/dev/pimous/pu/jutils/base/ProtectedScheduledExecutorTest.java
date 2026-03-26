@@ -17,10 +17,10 @@ class ProtectedScheduledExecutorTest{
 			= new ProtectedScheduledExecutor(ses);
 
 		assertThrows(OperationNotPermittedException.class,
-			() -> protectedSES.shutdown()
+			protectedSES::shutdown
 		);
 		assertThrows(OperationNotPermittedException.class,
-			() -> protectedSES.shutdownNow()
+			protectedSES::shutdownNow
 		);
 
 		ses.shutdownNow();

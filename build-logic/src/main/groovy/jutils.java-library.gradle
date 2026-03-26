@@ -1,9 +1,32 @@
 plugins{
+	id("java")
 	id("java-library")
 }
 
 group = projectGroup
 version = projectVersion
+
+sourceSets{
+	ftest{
+		compileClasspath += main.output
+		runtimeClasspath += main.output
+	}
+}
+configurations.ftestImplementation.extendsFrom(
+	configurations.testImplementation
+)
+configurations.ftestRuntimeOnly.extendsFrom(configurations.testRuntimeOnly)
+
+repositories{
+	mavenCentral()
+}
+dependencies{
+	compileOnly "org.jetbrains:annotations:26.1.0"
+
+	testImplementation platform("org.junit:junit-bom:5.10.0")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
 
 tasks.withType(JavaCompile).configureEach{
 	options.compilerArgs.add("-Xlint:all")
@@ -11,19 +34,21 @@ tasks.withType(JavaCompile).configureEach{
 	options.deprecation = true
 }
 
-repositories{
-	mavenCentral()
-}
-dependencies{
-	testImplementation platform("org.junit:junit-bom:5.10.0")
-	testImplementation "org.junit.jupiter:junit-jupiter"
-	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-}
-
 tasks.withType(Test).configureEach{
 	useJUnitPlatform()
 	maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
 }
+tasks.register("ftest", Test){
+	description = "Runs functional tests."
+	group = "verification"
+	shouldRunAfter test
+
+	testClassesDirs = sourceSets.ftest.output.classesDirs
+	classpath = sourceSets.ftest.runtimeClasspath
+
+	useJUnitPlatform()
+}
+check.dependsOn tasks.ftest
 
 jar{
 	doLast{

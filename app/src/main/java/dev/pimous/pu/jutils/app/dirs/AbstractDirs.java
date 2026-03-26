@@ -19,22 +19,27 @@ public abstract class AbstractDirs implements Directories{
 	protected static final String LOG_DIR = "log";
 
 	private final Configuration config;
+	private final boolean shouldDirsExist;
 
-	protected AbstractDirs(final Configuration config){
+	protected AbstractDirs(final Configuration config,
+		final boolean shouldDirsExist
+	){
 		this.config = config;
+		this.shouldDirsExist = shouldDirsExist;
 	}
 
 	// GETTERS
 	protected Configuration getConfig(){ return config; }
+	protected boolean shouldDirsBeMade(){ return !shouldDirsExist; }
 	protected Path getHomeDir(){
 		return config.getSystem().getHome().toPath();
 	}
 
 	// SETTERS
-	protected File makeDir(final File parent, final File full){
-		if(parent.exists())
-			full.mkdirs();
-
-		return full;
+	protected void makeDir(final File parent, final File full){
+		if(parent.exists() && !full.mkdirs())
+			throw new RuntimeException(
+				"Unable to create %s directory;".formatted(full)
+			);
 	}
 }

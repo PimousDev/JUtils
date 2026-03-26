@@ -15,8 +15,8 @@ public class LinuxDirs extends AbstractDirs{
 	private static final String GLOBAL_SHARE_DIR = ".local/share";
 	private static final String GLOBAL_CACHE_DIR = ".cache";
 
-	public LinuxDirs(final Configuration config){
-		super(config);
+	public LinuxDirs(final Configuration config, final boolean shouldDirsExist){
+		super(config, shouldDirsExist);
 	}
 
 	// GETTERS
@@ -26,8 +26,13 @@ public class LinuxDirs extends AbstractDirs{
 	}
 	@Override
 	public File getConfigDir(final String identifier){
-		File parent = getGlobalConfigDir();
-		return makeDir(parent, new File(parent, identifier));
+		final File parent = getGlobalConfigDir();
+		final File full = new File(parent, identifier);
+
+		if(shouldDirsBeMade())
+			makeDir(parent, full);
+
+		return full;
 	}
 	@Override
 	public File getGlobalDataDir(){
@@ -35,10 +40,15 @@ public class LinuxDirs extends AbstractDirs{
 	}
 	@Override
 	public File getDataDir(final String identifier){
-		File parent = getGlobalDataDir();
-		return makeDir(parent,
-			Path.of(parent.toString(), identifier, DATA_DIR).toFile()
-		);
+		final File parent = getGlobalDataDir();
+		final File full = Path.of(
+			parent.toString(), identifier, DATA_DIR
+		).toFile();
+
+		if(shouldDirsBeMade())
+			makeDir(parent, full);
+
+		return full;
 	}
 	@Override
 	public File getGlobalCacheDir(){
@@ -46,8 +56,13 @@ public class LinuxDirs extends AbstractDirs{
 	}
 	@Override
 	public File getCacheDir(final String identifier){
-		File parent = getGlobalCacheDir();
-		return makeDir(parent, new File(parent, identifier));
+		final File parent = getGlobalCacheDir();
+		final File full = new File(parent, identifier);
+
+		if(shouldDirsBeMade())
+			makeDir(parent, full);
+
+		return full;
 	}
 
 	@Override
@@ -56,8 +71,13 @@ public class LinuxDirs extends AbstractDirs{
 	}
 	@Override
 	public File getTempDir(final String identifier){
-		File parent = getGlobalTempDir();
-		return makeDir(parent, new File(parent, identifier));
+		final File parent = getGlobalTempDir();
+		final File full = new File(parent, identifier);
+
+		if(shouldDirsBeMade())
+			makeDir(parent, full);
+
+		return full;
 	}
 	@Override
 	public File getGlobalLogDir(){
@@ -66,8 +86,13 @@ public class LinuxDirs extends AbstractDirs{
 	@Override
 	public File getLogDir(final String identifier){
 		File parent = getGlobalLogDir();
-		return makeDir(parent,
-			Path.of(parent.toString(), identifier, LOG_DIR).toFile()
-		);
+		final File full = Path.of(
+			parent.toString(), identifier, LOG_DIR
+		).toFile();
+
+		if(shouldDirsBeMade())
+			makeDir(parent, full);
+
+		return full;
 	}
 }

@@ -1,14 +1,12 @@
 package dev.pimous.pu.jutils.app;
 
+import dev.pimous.pu.jutils.app.dirs.LinuxDirs;
+import dev.pimous.pu.jutils.app.dirs.LocalDirs;
 import dev.pimous.pu.jutils.config.Configuration;
-import dev.pimous.pu.jutils.i18n.I18n;
 import org.junit.jupiter.api.Test;
 
-import java.io.Console;
 import java.io.File;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,30 +15,50 @@ class DirectoriesTest{
 
 	@Test
 	void getters(){
-		TestApp app = new TestApp(0);
-		app.load(new DummyConfig(getProperties("system.properties")));
-		assertEquals(new File("config"), app.getConfigDir());
-		assertEquals(new File("data"), app.getDataDir());
-		assertEquals(new File("cache"), app.getCacheDir());
-		assertEquals(new File("tmp"), app.getTempDir());
-		assertEquals(new File("log"), app.getLogDir());
+		Directories dirs = new LocalDirs(
+			new DummyConfig(getProperties("system/dirs.properties")),
+			true
+		);
+		assertEquals(new File("config"), dirs.getGlobalConfigDir());
+		assertEquals(new File("data"), dirs.getGlobalDataDir());
+		assertEquals(new File("cache"), dirs.getGlobalCacheDir());
+		assertEquals(new File("tmp"), dirs.getGlobalTempDir());
+		assertEquals(new File("log"), dirs.getGlobalLogDir());
+		assertEquals(new File("config"), dirs.getConfigDir("afl"));
+		assertEquals(new File("data"), dirs.getDataDir("afl"));
+		assertEquals(new File("cache"), dirs.getCacheDir("afl"));
+		assertEquals(new File("tmp"), dirs.getTempDir("afl"));
+		assertEquals(new File("log"), dirs.getLogDir("afl"));
 
-		app = new TestApp(0);
-		app.load(new DummyConfig(getProperties("linuxSystem.properties")));
-		assertEquals(new File("/home/rulietta/.config/testApp"),
-			app.getConfigDir()
+		dirs = new LinuxDirs(
+			new DummyConfig(getProperties("system/linuxDirs.properties")),
+			false
 		);
-		assertEquals(new File("/home/rulietta/.local/share/testApp/data"),
-			app.getDataDir()
+		assertEquals(new File("undefined/home/.config"),
+			dirs.getGlobalConfigDir()
 		);
-		assertEquals(new File("/home/rulietta/.cache/testApp"),
-			app.getCacheDir()
+		assertEquals(new File("undefined/home/.local/share"),
+			dirs.getGlobalDataDir()
 		);
-		assertEquals(new File("/tmp/testApp"),
-			app.getTempDir()
+		assertEquals(new File("undefined/home/.cache"),
+			dirs.getGlobalCacheDir()
 		);
-		assertEquals(new File("/home/rulietta/.local/share/testApp/log"),
-			app.getLogDir()
+		assertEquals(new File("undefined/tmp"), dirs.getGlobalTempDir());
+		assertEquals(new File("undefined/home/.local/share"),
+			dirs.getGlobalLogDir()
+		);
+		assertEquals(new File("undefined/home/.config/afl"),
+			dirs.getConfigDir("afl")
+		);
+		assertEquals(new File("undefined/home/.local/share/afl/data"),
+			dirs.getDataDir("afl")
+		);
+		assertEquals(new File("undefined/home/.cache/afl"),
+			dirs.getCacheDir("afl")
+		);
+		assertEquals(new File("undefined/tmp/afl"), dirs.getTempDir("afl"));
+		assertEquals(new File("undefined/home/.local/share/afl/log"),
+			dirs.getLogDir("afl")
 		);
 	}
 
@@ -58,24 +76,6 @@ class DirectoriesTest{
 	}
 
 	// INNER CLASSES
-	private static class TestApp extends App<Configuration>{
-
-		private static final I18n language = new I18n(Locale.FRENCH, List.of());
-
-		public TestApp(final int threads){
-			super(threads);
-		}
-
-		// FUNCTIONS
-		public void load(final Configuration config){
-			super.load(config, language, false);
-		}
-
-		@Override
-		public void run(String[] args){}
-		@Override
-		public void run(Console console, String[] args){}
-	}
 	private static class DummyConfig extends Configuration{
 
 		public DummyConfig(final Properties system){

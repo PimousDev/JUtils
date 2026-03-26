@@ -1,12 +1,9 @@
 package dev.pimous.pu.jutils.i18n;
 
 import dev.pimous.pu.jutils.base.BadResourceException;
-import dev.pimous.pu.jutils.base.ResourcePaths;
 import dev.pimous.pu.jutils.i18n.impl.I18nConcreteBundle;
 import dev.pimous.pu.jutils.i18n.util.LocaleResPaths;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.*;
 

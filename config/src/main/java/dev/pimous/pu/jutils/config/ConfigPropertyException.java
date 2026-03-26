@@ -11,13 +11,7 @@ public class ConfigPropertyException extends ConfigException{
 	@Serial
 	private static final long serialVersionUID = 4686574098775400032L;
 
-	public ConfigPropertyException(Throwable cause){
-		super(cause);
-	}
-	public ConfigPropertyException(String message, Throwable cause){
-		super(message, cause);
-	}
-	protected ConfigPropertyException(String message){
+	public ConfigPropertyException(String message){
 		super(message);
 	}
 }

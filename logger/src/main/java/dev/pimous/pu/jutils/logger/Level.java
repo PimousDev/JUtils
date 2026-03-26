@@ -26,7 +26,7 @@ public enum Level{
 
 	public final byte code;
 
-	private Level(final byte code){
+	Level(final byte code){
 		this.code = code;
 	}
 
@@ -35,7 +35,7 @@ public enum Level{
 		return Arrays.stream(Level.values())
 			.filter(l -> l.code == code)
 			.findFirst()
-			.get();
+			.orElseThrow();
 	}
 	public static Level getLevel(final int code){
 		return getLevel((byte) code);

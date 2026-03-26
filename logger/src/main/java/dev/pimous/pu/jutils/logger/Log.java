@@ -19,6 +19,7 @@ public record Log<T>(
 
 	private static final AtomicLong UNIVERSAL_NUMBER = new AtomicLong();
 
+	@SuppressWarnings("unused")
 	public Log(final long number, final Thread thread,
 		final Level level,
 		final String message, final Object[] arguments,

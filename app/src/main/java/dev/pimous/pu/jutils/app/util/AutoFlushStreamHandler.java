@@ -5,6 +5,10 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
+/**
+ * @author Xibitol
+ * @since 1.0.0
+ */
 public class AutoFlushStreamHandler extends StreamHandler{
 
 	public AutoFlushStreamHandler(

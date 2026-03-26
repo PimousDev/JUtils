@@ -114,8 +114,12 @@ class JULAdapterTest{
 
 	private static class A{
 
-		private static String f = "f";
-		private String l = "l";
+		private static final String f = "f";
+		private final String l;
+
+		{
+			l = "l";
+		}
 
 		// FUNCTIONS
 		@Override

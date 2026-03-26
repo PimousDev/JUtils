@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AppLoggerFormatterTest{
 
+	@SuppressWarnings("LongLine")
 	@Test
 	void formatting(){
 		final Throwable t = new FileNotFoundException();

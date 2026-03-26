@@ -10,8 +10,8 @@ import java.io.File;
  */
 public class LocalDirs extends AbstractDirs{
 
-	public LocalDirs(final Configuration config){
-		super(config);
+	public LocalDirs(final Configuration config, final boolean shouldDirsExist){
+		super(config, shouldDirsExist);
 	}
 
 	// GETTERS
@@ -22,7 +22,8 @@ public class LocalDirs extends AbstractDirs{
 	@Override
 	public File getConfigDir(final String identifier){
 		File dir = getGlobalConfigDir();
-		return makeDir(dir, dir);
+		if(shouldDirsBeMade()) makeDir(dir, dir);
+		return dir;
 	}
 	@Override
 	public File getGlobalDataDir(){
@@ -31,7 +32,8 @@ public class LocalDirs extends AbstractDirs{
 	@Override
 	public File getDataDir(final String identifier){
 		File dir = getGlobalDataDir();
-		return makeDir(dir, dir);
+		if(shouldDirsBeMade()) makeDir(dir, dir);
+		return dir;
 	}
 	@Override
 	public File getGlobalCacheDir(){
@@ -40,7 +42,8 @@ public class LocalDirs extends AbstractDirs{
 	@Override
 	public File getCacheDir(final String identifier){
 		File dir = getGlobalCacheDir();
-		return makeDir(dir, dir);
+		if(shouldDirsBeMade()) makeDir(dir, dir);
+		return dir;
 	}
 
 	@Override
@@ -50,7 +53,8 @@ public class LocalDirs extends AbstractDirs{
 	@Override
 	public File getTempDir(final String identifier){
 		File dir = getGlobalTempDir();
-		return makeDir(dir, dir);
+		if(shouldDirsBeMade()) makeDir(dir, dir);
+		return dir;
 	}
 	@Override
 	public File getGlobalLogDir(){
@@ -59,6 +63,7 @@ public class LocalDirs extends AbstractDirs{
 	@Override
 	public File getLogDir(final String identifier){
 		File dir = getGlobalLogDir();
-		return makeDir(dir, dir);
+		if(shouldDirsBeMade()) makeDir(dir, dir);
+		return dir;
 	}
 }

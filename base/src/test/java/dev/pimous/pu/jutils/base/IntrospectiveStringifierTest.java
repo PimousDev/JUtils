@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class IntrospectiveStringifierTest{
 
+	@SuppressWarnings("LongLine")
 	@Test
 	void classes(){
 		assertEquals(
@@ -38,6 +39,7 @@ class IntrospectiveStringifierTest{
 		);
 	}
 
+	@SuppressWarnings("LongLine")
 	@Test
 	void instances(){
 		assertEquals(
@@ -62,12 +64,12 @@ class IntrospectiveStringifierTest{
 	// INNER CLASSES
 	private static class A{
 
-		public static int af = 31;
+		public static final int af = 31;
 		public float aa;
-		protected static short ab = 1;
-		protected byte ac = 20;
+		protected static final short ab = 1;
+		protected final byte ac = 20;
 		private static long ad;
-		private double micro = 0.24D;
+		private final double micro = 0.24D;
 
 		// FUNCTIONS
 		@Override
@@ -75,18 +77,18 @@ class IntrospectiveStringifierTest{
 			return af + ab + ac;
 		}
 	}
-	private static interface B{
+	private interface B{
 
-		public final char bf = 'l'; // Static by default?
-		public static final String ba = "I'm \"foobar\", the famous text!";
+		char bf = 'l'; // Static by default?
+		String ba = "I'm \"foobar\", the famous text!";
 	}
-	private static final class C extends A implements B{
+	private static class C extends A implements B{
 
 		public String cf = "test";
 		public static ResourcePaths ca;
 		protected Logger cb;
-		protected static AtomicLong cc = new AtomicLong(31);
-		private InternalException cd = new InternalException("There is no errors.");
+		protected static final AtomicLong cc = new AtomicLong(31);
+		private final InternalException cd = new InternalException("There is no errors.");
 		private static BadResourceException dvd;
 
 		// FUNCTIONS

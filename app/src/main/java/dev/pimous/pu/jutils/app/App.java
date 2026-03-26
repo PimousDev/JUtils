@@ -73,6 +73,7 @@ public abstract class App<C extends Configuration>{
 			appConfig.getIdentifier()
 		);
 		julLogger.setUseParentHandlers(false);
+		julLogger.setLevel(Level.INFO);
 		for(Handler h : julLogger.getHandlers())
 			julLogger.removeHandler(h);
 		logger = new JULAdapter(julLogger);
@@ -188,7 +189,7 @@ public abstract class App<C extends Configuration>{
 
 		if(fhException != null)
 			logger.error(fhException,
-				getI18n().getSentence("log.error.openFile", getLogDir())
+				getI18n().getSentence("log.error.open", getLogDir())
 			);
 
 		if(configException == null){

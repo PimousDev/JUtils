@@ -12,29 +12,33 @@ import java.io.File;
  */
 public interface Directories{
 
-	public static final String OS_WIN_NAME = "win";
-	public static final String OS_LINUX_NAME = "linux";
+	String OS_LINUX_NAME = "linux";
 
 	// GETTERS
-	public abstract File getGlobalConfigDir();
-	public abstract File getConfigDir(final String identifier);
-	public abstract File getGlobalDataDir();
-	public abstract File getDataDir(final String identifier);
-	public abstract File getGlobalCacheDir();
-	public abstract File getCacheDir(final String identifier);
+	File getGlobalConfigDir();
+	File getConfigDir(final String identifier);
+	File getGlobalDataDir();
+	File getDataDir(final String identifier);
+	File getGlobalCacheDir();
+	File getCacheDir(final String identifier);
 
-	public abstract File getGlobalTempDir();
-	public abstract File getTempDir(final String identifier);
-	public abstract File getGlobalLogDir();
-	public abstract File getLogDir(final String identifier);
+	File getGlobalTempDir();
+	File getTempDir(final String identifier);
+	File getGlobalLogDir();
+	File getLogDir(final String identifier);
 
 	// FUNCTIONS
-	public static Directories create(final Configuration config){
+	static Directories create(final Configuration config){
+		return create(config, false);
+	}
+	static Directories create(final Configuration config,
+		final boolean shouldDirsExists
+	){
 		String os = config.getSystem().getOSName().toLowerCase();
 
 		if(os.contains(OS_LINUX_NAME))
-			return new LinuxDirs(config);
+			return new LinuxDirs(config, shouldDirsExists);
 		else
-			return new LocalDirs(config);
+			return new LocalDirs(config, shouldDirsExists);
 	}
 }

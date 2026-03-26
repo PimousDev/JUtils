@@ -18,7 +18,7 @@ public abstract class ConfigSection{
 	public ConfigSection(){}
 
 	// GETTERS
-	private final Stream<Field> getFields(){
+	private Stream<Field> getFields(){
 		return Arrays.stream(getClass().getDeclaredFields())
 			.filter(f -> f.isAnnotationPresent(ConfigField.class));
 	}
@@ -65,7 +65,7 @@ public abstract class ConfigSection{
 		for(final Field f : getFields().toList())
 			this.load(properties, f);
 	}
-	private final void load(final Properties properties, final Field field)
+	private void load(final Properties properties, final Field field)
 		throws ConfigPropertyException, IllegalArgumentException
 	{
 		final String p = getPropertyName(field);
@@ -99,7 +99,7 @@ public abstract class ConfigSection{
 	}
 
 	// FUNCTIONS
-	private final Properties toProperties(Predicate<Field> filter){
+	private Properties toProperties(Predicate<Field> filter){
 		final Properties props = new Properties();
 
 		getFields().filter(filter).forEach(f -> {
@@ -119,11 +119,11 @@ public abstract class ConfigSection{
 		return props;
 	}
 	public final Properties toProperties(){
-		return toProperties(f -> true);
+		return toProperties(_ -> true);
 	}
 	public final Properties toSavedProperties(){
 		return toProperties(
-			f -> !f.getAnnotation(ConfigField.class).readonly()
+			f -> f.getAnnotation(ConfigField.class).modifiable()
 		);
 	}
 
@@ -133,8 +133,8 @@ public abstract class ConfigSection{
 	@Documented
 	public @interface ConfigField{
 
-		public String property() default "";
-		public boolean mandatory() default false;
-		public boolean readonly() default true;
+		String property() default "";
+		boolean mandatory() default false;
+		boolean modifiable() default false;
 	}
 }
