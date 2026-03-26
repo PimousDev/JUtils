@@ -12,7 +12,7 @@ import java.io.File;
  */
 public interface Directories{
 
-	String OS_LINUX_NAME = "linux";
+	String OS_LINUX_NAME = "Linux".toLowerCase();
 
 	// GETTERS
 	File getGlobalConfigDir();
