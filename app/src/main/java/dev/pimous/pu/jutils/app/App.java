@@ -15,9 +15,11 @@ import dev.pimous.pu.jutils.logger.Logger;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.*;
@@ -95,6 +97,12 @@ public abstract class App<C extends Configuration>{
 	public TimeZone getTimeZone(){ return timeZone; }
 	public ScheduledExecutorService getExecutor(){
 		return new ProtectedScheduledExecutor(executor);
+	}
+	protected final void shutdownExecutor(){
+		executor.shutdown();
+	}
+	protected final List<Runnable> shutdownExecutorNow(){
+		return executor.shutdownNow();
 	}
 
 	public File getConfigDir(){ return dirs.getConfigDir(getIdentifier()); }

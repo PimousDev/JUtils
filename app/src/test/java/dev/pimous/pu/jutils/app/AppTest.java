@@ -55,6 +55,17 @@ class AppTest{
 		assertNull(app.console);
 	}
 
+	@Test
+	void executor(){
+		TestApp app = new TestApp(0);
+		app.shutdownExecutor();
+		assertTrue(app.getExecutor().isShutdown());
+
+		app = new TestApp(0);
+		app.shutdownExecutorNow();
+		assertTrue(app.getExecutor().isShutdown());
+	}
+
 	// INNER CLASSES
 	private static class TestApp extends App<Configuration>{
 
