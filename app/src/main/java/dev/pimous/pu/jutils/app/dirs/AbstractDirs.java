@@ -37,7 +37,7 @@ public abstract class AbstractDirs implements Directories{
 
 	// SETTERS
 	protected void makeDir(final File parent, final File full){
-		if(parent.exists() && !full.mkdirs())
+		if(parent.exists() && !full.exists() && !full.mkdirs())
 			throw new RuntimeException(
 				"Unable to create %s directory;".formatted(full)
 			);
