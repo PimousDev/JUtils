@@ -1,5 +1,8 @@
 plugins{
-	id("jutils.java-library")
+	id "java-library"
+
+	id "jutils"
+	id "jutils.jar.libs"
 }
 
 description = configDescription

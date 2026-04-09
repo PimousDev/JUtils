@@ -1,0 +1,21 @@
+plugins{
+	id "application"
+}
+
+run{
+	def tmpDir = project.rootProject.file("${runWorkingDir}/tmp")
+
+	workingDir = project.rootProject.file(
+		"${runWorkingDir}/${project.name}"
+	)
+	jvmArgs = [
+		"-Duser.home=${workingDir}",
+		"-Djava.io.tmpdir=${tmpDir}"
+	]
+	args = [
+		"--debug"
+	]
+
+	mkdir(workingDir)
+	mkdir(tmpDir)
+}

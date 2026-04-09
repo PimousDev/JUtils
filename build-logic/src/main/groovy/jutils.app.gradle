@@ -1,0 +1,6 @@
+def props = project.provider{ project.properties }
+processResources{
+	filesMatching("app.properties"){
+		expand(props.get() as Map<String, ?>)
+	}
+}
