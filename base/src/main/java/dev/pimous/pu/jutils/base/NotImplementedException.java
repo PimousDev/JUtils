@@ -13,4 +13,7 @@ public class NotImplementedException extends InternalException{
 	public NotImplementedException(String message){
 		super(message);
 	}
+	public NotImplementedException(){
+		super();
+	}
 }

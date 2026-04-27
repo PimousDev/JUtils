@@ -20,4 +20,7 @@ public class InternalException extends RuntimeException{
 	protected InternalException(String message){
 		super(message);
 	}
+	protected InternalException(){
+		super();
+	}
 }

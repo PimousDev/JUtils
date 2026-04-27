@@ -11,6 +11,9 @@ class NIExceptionTest{
 		final Exception cause = new Exception();
 		Exception e;
 
+		e = new NotImplementedException();
+		assertNull(e.getMessage());
+
 		e = new NotImplementedException("afl");
 		assertEquals("afl", e.getMessage());
 

@@ -8,17 +8,12 @@ class ONPExceptionTest{
 
 	@Test
 	void instanciation(){
-		final Exception cause = new Exception();
 		Exception e;
+
+		e = new OperationNotPermittedException();
+		assertNull(e.getMessage());
 
 		e = new OperationNotPermittedException("afl");
 		assertEquals("afl", e.getMessage());
-
-		e = new OperationNotPermittedException("afl", cause);
-		assertEquals("afl", e.getMessage());
-		assertEquals(cause, e.getCause());
-
-		e = new OperationNotPermittedException(cause);
-		assertEquals(cause, e.getCause());
 	}
 }

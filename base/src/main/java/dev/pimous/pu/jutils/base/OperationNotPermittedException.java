@@ -11,13 +11,10 @@ public class OperationNotPermittedException extends InternalException{
 	@Serial
 	private static final long serialVersionUID = 6497150854528146844L;
 
-	public OperationNotPermittedException(Throwable cause){
-		super(cause);
+	public OperationNotPermittedException(){
+		super();
 	}
-	public OperationNotPermittedException(String message, Throwable cause){
-		super(message, cause);
-	}
-	protected OperationNotPermittedException(String message){
+	public OperationNotPermittedException(String message){
 		super(message);
 	}
 }
