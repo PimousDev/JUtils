@@ -1,21 +1,21 @@
 plugins{
-	id "application"
+    id "application"
 }
 
-run{
-	def tmpDir = project.rootProject.file("${runWorkingDir}/tmp")
+tasks.named("run", JavaExec){
+    def tmpDir = project.rootProject.file("${runWorkingDir}/tmp")
 
-	workingDir = project.rootProject.file(
-		"${runWorkingDir}/${project.name}"
-	)
-	jvmArgs = [
-		"-Duser.home=${workingDir}",
-		"-Djava.io.tmpdir=${tmpDir}"
-	]
-	args = [
-		"--debug"
-	]
+    workingDir = project.rootProject.file(
+            "${runWorkingDir}/${project.name}"
+    )
+    jvmArgs = [
+            "-Duser.home=${workingDir}",
+            "-Djava.io.tmpdir=${tmpDir}"
+    ]
+    args = [
+            "--debug"
+    ]
 
-	mkdir(workingDir)
-	mkdir(tmpDir)
+    mkdir(workingDir)
+    mkdir(tmpDir)
 }
