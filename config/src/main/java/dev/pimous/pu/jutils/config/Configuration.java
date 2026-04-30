@@ -3,6 +3,7 @@ package dev.pimous.pu.jutils.config;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,18 +114,16 @@ public abstract class Configuration{
 		throws ConfigPropertyException, IllegalArgumentException
 	{
 		for(Map.Entry<String, ConfigSection> e : sections.entrySet()){
-			final String prefix = e.getKey() + SECTION_DELIMITER;
-
 			final Properties sectionProps = new Properties();
 			sectionProps.putAll(properties.stringPropertyNames().stream()
-				.filter(p -> p.startsWith(prefix))
+				.filter(p -> p.startsWith(e.getKey()))
 				.collect(Collectors.toMap(
-					p -> p.substring(prefix.length()),
+					Function.identity(),
 					properties::getProperty
 				))
 			);
 
-			e.getValue().load(sectionProps);
+			e.getValue().load(sectionProps, e.getKey());
 		}
 	}
 	public void load(final InputStream stream)
@@ -167,21 +166,10 @@ public abstract class Configuration{
 
 	// FUNCTIONS
 	private Properties toProperties(
-		Function<ConfigSection, Properties> getter
+		BiFunction<ConfigSection, String, Properties> getter
 	){
 		final Properties props = new Properties();
-
-		sections.forEach((n, s) ->
-			props.putAll(getter.apply(s).entrySet().stream()
-				.map(e -> Map.entry(
-					n + SECTION_DELIMITER + e.getKey(), e.getValue()
-				))
-				.collect(Collectors.toMap(
-					Map.Entry::getKey, Map.Entry::getValue
-				))
-			)
-		);
-
+		sections.forEach((n, s) -> props.putAll(getter.apply(s, n)));
 		return props;
 	}
 	public Properties toProperties(){

@@ -62,28 +62,37 @@ public abstract class ConfigSection{
 	public final void load(final Properties properties)
 		throws ConfigPropertyException, IllegalArgumentException
 	{
-		for(final Field f : getFields().toList())
-			this.load(properties, f);
+		load(properties, null);
 	}
-	private void load(final Properties properties, final Field field)
+	public final void load(final Properties properties, final String prefix)
 		throws ConfigPropertyException, IllegalArgumentException
 	{
+		for(final Field f : getFields().toList())
+			load(properties, prefix, f);
+	}
+	private void load(final Properties properties, final String prefix,
+		 final Field field
+	) throws ConfigPropertyException, IllegalArgumentException{
 		final String p = getPropertyName(field);
+		final String lp = (
+			prefix != null ? prefix + Configuration.SECTION_DELIMITER : ""
+		) + p;
 
 		// Presence
-		if(properties.getProperty(p) == null){
+		if(properties.getProperty(lp) == null){
 			if(field.getAnnotation(ConfigField.class).mandatory())
 				throw new ConfigPropertyException(
-					"Property %s is mandatory but not found;".formatted(p)
+					"Property %s is mandatory but not found;".formatted(lp)
 				);
 
 			return;
 		}
 
 		// Value
+		final Object o = getParser(p).apply(properties.getProperty(lp));
 		try{
 			field.setAccessible(true); // BUG: Is this can fail?
-			field.set(this, getParser(p).apply(properties.getProperty(p)));
+			field.set(this, o);
 		}catch(IllegalArgumentException e){
 			throw new ConfigImplementationException(
 				"Incompatible types between %s field and parser's return value;"
@@ -98,32 +107,43 @@ public abstract class ConfigSection{
 	}
 
 	// FUNCTIONS
-	private Properties toProperties(Predicate<Field> filter){
+	private Properties toProperties(final Predicate<Field> filter,
+		String prefix
+	){
 		final Properties props = new Properties();
+		prefix = prefix != null ? prefix + Configuration.SECTION_DELIMITER : "";
 
-		getFields().filter(filter).forEach(f -> {
+		for(Field f : getFields().filter(filter).toList()){
 			final String p = getPropertyName(f);
 			try{
 				f.setAccessible(true); // BUG: Is this can fail?
-				props.setProperty(getPropertyName(f),
+				props.setProperty(prefix + p,
 					getFormatter(p).apply(f.get(this)).toString()
 				);
 			}catch(ReflectiveOperationException e){
 				throw new ConfigImplementationException(
-					"Unable to get value of %s field;".formatted(f.getName()), e
+					"Unable to get value of %s field;".formatted(f.getName()),
+					e
 				);
 			}
-		});
+		}
 
 		return props;
 	}
+	public final Properties toProperties(String prefix){
+		return toProperties(_ -> true, prefix);
+	}
+	public final Properties toSavedProperties(String prefix){
+		return toProperties(
+			f -> f.getAnnotation(ConfigField.class).modifiable(),
+			prefix
+		);
+	}
 	public final Properties toProperties(){
-		return toProperties(_ -> true);
+		return toProperties(null);
 	}
 	public final Properties toSavedProperties(){
-		return toProperties(
-			f -> f.getAnnotation(ConfigField.class).modifiable()
-		);
+		return toSavedProperties(null);
 	}
 
 	// INNER CLASSES

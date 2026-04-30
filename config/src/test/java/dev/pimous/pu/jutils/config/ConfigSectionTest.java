@@ -50,6 +50,34 @@ class ConfigSectionTest{
 		assertEquals("31.1.20-b.26", tc.version.toString());
 	}
 	@Test
+	void loadingWithPrefix(){
+		final TestConfig tc = new TestConfig();
+
+		assertDoesNotThrow(
+			() -> tc.load(
+				getProperties("section/testPrefixed.properties"), "afl"
+			)
+		);
+		assertEquals("A", tc.f);
+		assertEquals(24, tc.number);
+		assertEquals("31.1.20-b.20", tc.version.toString());
+		assertEquals("test2", tc.a);
+
+		assertDoesNotThrow(
+			() -> tc.load(
+				getProperties("section/testMandPrefixed.properties"), "afl"
+			)
+		);
+		assertEquals("31.1.20-b.24", tc.version.toString());
+
+		assertDoesNotThrow(
+			() -> tc.load(
+				getProperties("section/testUndefinedPrefixed.properties"), "afl"
+			)
+		);
+		assertEquals("31.1.20-b.26", tc.version.toString());
+	}
+	@Test
 	void loadingError(){
 		final TestConfig tc = new TestConfig();
 
@@ -73,9 +101,37 @@ class ConfigSectionTest{
 		assertEquals("null", props.getProperty("version"));
 		assertEquals("test", props.getProperty("a"));
 
+		props = tc.toProperties("afl");
+		assertEquals(4, props.size());
+		assertEquals("f", props.getProperty("afl.name"));
+		assertEquals("20", props.getProperty("afl.number"));
+		assertEquals("null", props.getProperty("afl.version"));
+		assertEquals("test", props.getProperty("afl.a"));
+
 		props = tc.toSavedProperties();
 		assertEquals(1, props.size());
 		assertEquals("20", props.getProperty("number"));
+
+		props = tc.toSavedProperties("afl");
+		assertEquals(1, props.size());
+		assertEquals("20", props.getProperty("afl.number"));
+	}
+
+	@Test
+	void toPropertiesWithPrefix(){
+		final TestConfig tc = new TestConfig();
+		Properties props;
+
+		props = tc.toProperties("afl");
+		assertEquals(4, props.size());
+		assertEquals("f", props.getProperty("afl.name"));
+		assertEquals("20", props.getProperty("afl.number"));
+		assertEquals("null", props.getProperty("afl.version"));
+		assertEquals("test", props.getProperty("afl.a"));
+
+		props = tc.toSavedProperties("afl");
+		assertEquals(1, props.size());
+		assertEquals("20", props.getProperty("afl.number"));
 	}
 
 	// FUNCTIONS
