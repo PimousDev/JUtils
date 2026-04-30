@@ -81,17 +81,16 @@ public abstract class ConfigSection{
 		}
 
 		// Value
-		final Object o = getParser(p).apply(properties.getProperty(p));
 		try{
 			field.setAccessible(true); // BUG: Is this can fail?
-			field.set(this, o);
+			field.set(this, getParser(p).apply(properties.getProperty(p)));
 		}catch(IllegalArgumentException e){
 			throw new ConfigImplementationException(
 				"Incompatible types between %s field and parser's return value;"
 					.formatted(field.getName()),
 				e
 			);
-		}catch(Exception e){
+		}catch(ReflectiveOperationException e){
 			throw new ConfigImplementationException(
 				"Unable to set value of %s field;".formatted(field.getName()), e
 			);
@@ -109,7 +108,7 @@ public abstract class ConfigSection{
 				props.setProperty(getPropertyName(f),
 					getFormatter(p).apply(f.get(this)).toString()
 				);
-			}catch(Exception e){
+			}catch(ReflectiveOperationException e){
 				throw new ConfigImplementationException(
 					"Unable to get value of %s field;".formatted(f.getName()), e
 				);
