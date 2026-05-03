@@ -14,6 +14,8 @@ public class AppLogger extends JULAdapter{
 		super(Logger.getLogger(identifier));
 
 		rootJulLogger = Logger.getLogger("");
+		for(Handler h : rootJulLogger.getHandlers())
+			rootJulLogger.removeHandler(h);
 	}
 
 	// SETTERS
@@ -36,9 +38,6 @@ public class AppLogger extends JULAdapter{
 				context.out, formatter
 			);
 			outHandler.setLevel(Level.ALL);
-			outHandler.setFilter(
-				(r) -> r.getLevel().intValue() >= Level.INFO.intValue()
-			);
 			rootJulLogger.addHandler(outHandler);
 		}
 		rootJulLogger.addHandler(errHandler);
