@@ -24,9 +24,8 @@ public class JULAdapter implements Logger{
 			case FATAL, CRITICAL, ERROR -> java.util.logging.Level.SEVERE;
 			case WARNING -> java.util.logging.Level.WARNING;
 			case NOTICE -> java.util.logging.Level.INFO;
-			case INFORMATION -> java.util.logging.Level.CONFIG;
-			case DEBUG -> java.util.logging.Level.FINE;
-			case TRACE -> java.util.logging.Level.FINEST;
+			case INFORMATION, DEBUG -> java.util.logging.Level.CONFIG;
+			case TRACE -> java.util.logging.Level.FINE;
 		};
 	}
 
