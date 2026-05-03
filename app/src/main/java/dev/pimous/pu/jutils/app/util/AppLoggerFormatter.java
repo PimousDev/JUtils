@@ -1,4 +1,4 @@
-package dev.pimous.pu.jutils.app;
+package dev.pimous.pu.jutils.app.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

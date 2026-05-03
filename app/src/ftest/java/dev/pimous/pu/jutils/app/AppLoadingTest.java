@@ -70,7 +70,6 @@ class AppLoadingTest{
 			false
 		));
 	}
-
 	@Test
 	void loadingSystem(){
 		assertFalse(configFile.exists());
@@ -89,7 +88,6 @@ class AppLoadingTest{
 		assertEquals(ZoneId.of("CET"), app.getTimeZone().toZoneId());
 		assertTrue(app.isLoaded());
 	}
-
 	@Test
 	void loadingConfig() throws IOException{
 		if(!configFile.createNewFile())

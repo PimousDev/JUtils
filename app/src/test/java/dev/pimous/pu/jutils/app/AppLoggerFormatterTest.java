@@ -1,5 +1,6 @@
 package dev.pimous.pu.jutils.app;
 
+import dev.pimous.pu.jutils.app.util.AppLoggerFormatter;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;

@@ -1,7 +1,6 @@
 package dev.pimous.pu.jutils.app;
 
-import dev.pimous.pu.jutils.app.util.AppFileHandler;
-import dev.pimous.pu.jutils.app.util.AutoFlushStreamHandler;
+import dev.pimous.pu.jutils.app.util.AppLogger;
 import dev.pimous.pu.jutils.base.BadResourceException;
 import dev.pimous.pu.jutils.base.ProtectedScheduledExecutor;
 import dev.pimous.pu.jutils.config.ConfigPropertyException;
@@ -9,7 +8,7 @@ import dev.pimous.pu.jutils.config.Configuration;
 import dev.pimous.pu.jutils.config.LocalizationConfig;
 import dev.pimous.pu.jutils.i18n.I18n;
 import dev.pimous.pu.jutils.i18n.I18nBundle;
-import dev.pimous.pu.jutils.logger.JULAdapter;
+import dev.pimous.pu.jutils.logger.Level;
 import dev.pimous.pu.jutils.logger.Logger;
 
 import java.io.*;
@@ -21,7 +20,6 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.*;
 
 /**
  * @author Xibitol
@@ -43,8 +41,7 @@ public abstract class App<C extends Configuration>{
 	private Directories dirs;
 	protected I18n language;
 	private TimeZone timeZone = TimeZone.getTimeZone(ZoneOffset.UTC);
-	private final java.util.logging.Logger julLogger;
-	public final Logger logger;
+	private final AppLogger logger;
 
 	public App(final int threads,
 		final InputStream in,
@@ -70,14 +67,8 @@ public abstract class App<C extends Configuration>{
 		}
 
 		// Logger
-		julLogger = java.util.logging.Logger.getLogger(
-			appConfig.getIdentifier()
-		);
-		julLogger.setUseParentHandlers(false);
-		julLogger.setLevel(Level.INFO);
-		for(Handler h : julLogger.getHandlers())
-			julLogger.removeHandler(h);
-		logger = new JULAdapter(julLogger);
+		logger = new AppLogger(appConfig.getIdentifier());
+		logger.setLevel(Level.NOTICE);
 
 		// Threads pool
 		executor = Executors.newScheduledThreadPool(threads);
@@ -94,6 +85,7 @@ public abstract class App<C extends Configuration>{
 	public C getConfig(){ return config; }
 	public I18nBundle getI18n(){ return language.getBundle(); }
 	public TimeZone getTimeZone(){ return timeZone; }
+	public Logger getLogger(){ return logger; };
 	public ScheduledExecutorService getExecutor(){
 		return new ProtectedScheduledExecutor(executor);
 	}
@@ -111,8 +103,8 @@ public abstract class App<C extends Configuration>{
 	public File getLogDir(){ return dirs.getLogDir(getIdentifier()); }
 
 	// SETTERS
-	public void setLoggingLevel(final dev.pimous.pu.jutils.logger.Level level){
-		julLogger.setLevel(JULAdapter.mapLevel(level));
+	public void setLoggingLevel(final Level level){
+		logger.setLevel(level);
 	}
 
 	// FUNCTIONS
@@ -160,29 +152,11 @@ public abstract class App<C extends Configuration>{
 			languageSupported = false;
 
 		// Logging without errors
-		final Formatter formatter = new AppLoggerFormatter(true);
-		final Handler errHandler = new AutoFlushStreamHandler(err, formatter);
-		errHandler.setLevel(Level.ALL);
-		if(hasGUI){
-			errHandler.setLevel(Level.WARNING);
-
-			final Handler outHandler = new AutoFlushStreamHandler(out,
-				formatter
-			);
-			outHandler.setLevel(Level.ALL);
-			outHandler.setFilter(
-				(r) -> r.getLevel().intValue() >= Level.INFO.intValue()
-			);
-			julLogger.addHandler(outHandler);
-		}
-		julLogger.addHandler(errHandler);
+		logger.loadConsoleHandlers(this, hasGUI);
 
 		Exception fhException = null;
 		try{
-			final FileHandler fh = new AppFileHandler(this);
-			fh.setFormatter(new AppLoggerFormatter(false));
-			fh.setLevel(Level.ALL);
-			julLogger.addHandler(fh);
+			logger.loadFileHandler(this);
 		}catch(IOException e){
 			fhException = e;
 		}
