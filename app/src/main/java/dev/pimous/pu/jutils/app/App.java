@@ -120,7 +120,7 @@ public abstract class App<C extends Configuration>{
 				)
 			);
 
-		// Configuration with errors
+		// Configuration without errors
 		this.config = config;
 		dirs = Directories.create(config);
 		Exception configException = null;
@@ -151,6 +151,24 @@ public abstract class App<C extends Configuration>{
 		if(!language.load(locale, Charset.defaultCharset()).equals(locale))
 			languageSupported = false;
 
+		// Configuration defaults without errors
+		Exception configDefaultsException = null;
+		Exception configReloadException = null;
+
+		if(configException instanceof FileNotFoundException){
+			try{
+				config.save(getI18n().getSentence("config.comment.defaults"));
+			}catch(Exception e){
+				configDefaultsException = e;
+			}
+
+			try{
+				config.load();
+			}catch(ConfigPropertyException | IllegalArgumentException e){
+				configReloadException = e;
+			}catch(IOException ignored){}
+		}
+
 		// Logging without errors
 		logger.loadConsoleHandlers(this, hasGUI);
 
@@ -178,21 +196,31 @@ public abstract class App<C extends Configuration>{
 				getConfig().getFile().getAbsolutePath()
 			));
 		}else if(configException instanceof FileNotFoundException){
-			try{
-				config.save(getI18n().getSentence("config.comment.defaults"));
-
+			if(configDefaultsException instanceof IOException)
+				logger.error(configDefaultsException);
+			else
 				logger.notice(getI18n().getSentence(
 					"config.generated",
 					config.getFile().getAbsolutePath()
 				));
-			}catch(IOException e2){
-				logger.error(e2);
+
+			if(configReloadException != null){
+				logger.fatal(getI18n().getSentence(
+					"config.error.reload",
+					getConfig().getFile().getAbsolutePath(),
+					configReloadException.getMessage()
+				));
+				throw new RuntimeException(configReloadException);
 			}
 		}else{
-			logger.warn(getI18n().getSentence("config.error.defaults",
+			logger.fatal(getI18n().getSentence(
+				"config.error.load",
+				getConfig().getFile().getAbsolutePath(),
 				configException.getMessage()
 			));
+			throw new RuntimeException(configException);
 		}
+
 
 		if(!languageSupported)
 			logger.warn(getI18n().getSentence("i18n.error.support",

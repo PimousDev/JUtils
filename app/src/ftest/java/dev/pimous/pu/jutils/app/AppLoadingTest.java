@@ -1,5 +1,7 @@
 package dev.pimous.pu.jutils.app;
 
+import dev.pimous.pu.jutils.config.ConfigPropertyException;
+import dev.pimous.pu.jutils.config.ConfigSection;
 import dev.pimous.pu.jutils.config.Configuration;
 import dev.pimous.pu.jutils.config.LocalizationConfig;
 import dev.pimous.pu.jutils.i18n.I18n;
@@ -62,13 +64,25 @@ class AppLoadingTest{
 		assertEquals(new File("tmp"), app.getTempDir());
 		assertEquals(new File("log"), app.getLogDir());
 
-		assertThrows(RuntimeException.class, () -> app.load(
+		assertThrowsExactly(RuntimeException.class, () -> app.load(
 			new LocalizedConfig(configFile,
 				getProperties("system.properties"),
 				false
 			),
 			false
 		));
+	}
+	@Test
+	void loadingDefaultsWithMandatoryUnset(){
+		assertFalse(configFile.exists());
+		assertThrowsExactly(RuntimeException.class, () -> app.load(
+			new UnsetConfig(configFile,
+				getProperties("system.properties"),
+				false
+			),
+			false
+		));
+		assertTrue(configFile.exists() && configFile.delete());
 	}
 	@Test
 	void loadingSystem(){
@@ -168,5 +182,23 @@ class AppLoadingTest{
 					Locale.of("en", "FR"), ZoneId.of("UTC")
 				));
 		}
+	}
+	private static class UnsetConfig extends LocalizedConfig{
+
+		public UnsetConfig(final File file,
+		                       final Properties system,
+		                       final boolean isLocalized
+		){
+			super(file, system, isLocalized);
+
+			addSection("unset", new UnsetSectionConfig());
+		}
+	}
+	private static class UnsetSectionConfig extends ConfigSection{
+
+		@ConfigField(mandatory = true)
+		private Integer unset;
+
+		public UnsetSectionConfig(){}
 	}
 }

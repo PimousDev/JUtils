@@ -8,7 +8,7 @@ import java.util.logging.*;
 
 public class AppLogger extends JULAdapter{
 
-	private final java.util.logging.Logger rootJulLogger;
+	private final Logger rootJulLogger;
 
 	public AppLogger(final String identifier){
 		super(Logger.getLogger(identifier));
