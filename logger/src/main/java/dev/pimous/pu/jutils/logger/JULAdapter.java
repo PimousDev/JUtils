@@ -1,7 +1,12 @@
 package dev.pimous.pu.jutils.logger;
 
 import dev.pimous.pu.jutils.base.IntrospectiveStringifier;
+import dev.pimous.pu.jutils.logger.jul.JULLevel;
 
+/**
+ * @author APG-Gillardeau
+ * @since 1.0.0
+ */
 public class JULAdapter implements Logger{
 
 	private final java.util.logging.Logger logger;
@@ -21,11 +26,14 @@ public class JULAdapter implements Logger{
 	// FUNCTIONS
 	public static java.util.logging.Level mapLevel(final Level level){
 		return switch(level){
-			case FATAL, CRITICAL, ERROR -> java.util.logging.Level.SEVERE;
-			case WARNING -> java.util.logging.Level.WARNING;
-			case NOTICE -> java.util.logging.Level.INFO;
-			case INFORMATION, DEBUG -> java.util.logging.Level.CONFIG;
-			case TRACE -> java.util.logging.Level.FINE;
+			case FATAL -> JULLevel.FATAL;
+			case CRITICAL -> JULLevel.CRITICAL;
+			case ERROR -> JULLevel.ERROR;
+			case WARNING -> JULLevel.WARNING;
+			case NOTICE -> JULLevel.NOTICE;
+			case INFORMATION -> JULLevel.INFORMATION;
+			case DEBUG -> JULLevel.DEBUG;
+			case TRACE -> JULLevel.TRACE;
 		};
 	}
 

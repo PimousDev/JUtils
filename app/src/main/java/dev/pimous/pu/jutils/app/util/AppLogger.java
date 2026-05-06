@@ -2,6 +2,7 @@ package dev.pimous.pu.jutils.app.util;
 
 import dev.pimous.pu.jutils.app.App;
 import dev.pimous.pu.jutils.logger.JULAdapter;
+import dev.pimous.pu.jutils.logger.JULLoggerFormatter;
 
 import java.io.IOException;
 import java.util.logging.*;
@@ -25,7 +26,7 @@ public class AppLogger extends JULAdapter{
 
 	// FUNCTIONS
 	public void loadConsoleHandlers(final App<?> context, final boolean hasGUI){
-		final Formatter formatter = new AppLoggerFormatter(true);
+		final Formatter formatter = new JULLoggerFormatter(true);
 		final Handler errHandler = new AutoFlushStreamHandler(
 			context.err, formatter
 		);
@@ -44,7 +45,7 @@ public class AppLogger extends JULAdapter{
 	}
 	public void loadFileHandler(final App<?> context) throws IOException{
 		final FileHandler fh = new AppFileHandler(context);
-		fh.setFormatter(new AppLoggerFormatter(false));
+		fh.setFormatter(new JULLoggerFormatter(false));
 		fh.setLevel(Level.ALL);
 		rootJulLogger.addHandler(fh);
 	}

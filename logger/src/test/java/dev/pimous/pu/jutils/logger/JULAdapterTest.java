@@ -1,6 +1,7 @@
 package dev.pimous.pu.jutils.logger;
 
 import dev.pimous.pu.jutils.base.InternalException;
+import dev.pimous.pu.jutils.logger.jul.JULLevel;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
@@ -42,45 +43,45 @@ class JULAdapterTest{
 		final Logger l = new JULAdapter(jul);
 
 		l.log(Level.FATAL, "This is a {0} inches test.", 31);
-		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
+		assertEquals(JULLevel.FATAL, bh.lastRecord.getLevel());
 		assertEquals("This is a {0} inches test.", bh.lastRecord.getMessage());
 		assertArrayEquals(new Object[]{31}, bh.lastRecord.getParameters());
-		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
+		assertEquals(JULLevel.FATAL, bh.lastRecord.getLevel());
 
 		final Throwable t = new InternalException("Problem.",
 			new FileNotFoundException("Problem cause.")
 		);
 		l.log(Level.FATAL, t);
-		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
+		assertEquals(JULLevel.FATAL, bh.lastRecord.getLevel());
 		assertEquals(t, bh.lastRecord.getThrown());
 		l.log(Level.FATAL, t, "Ooooh there is a %d problem!", 24);
-		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
+		assertEquals(JULLevel.FATAL, bh.lastRecord.getLevel());
 		assertEquals("Ooooh there is a 24 problem!",
 			bh.lastRecord.getMessage()
 		);
 		assertEquals(t, bh.lastRecord.getThrown());
 
 		l.logC(Level.FATAL, A.class);
-		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
+		assertEquals(JULLevel.FATAL, bh.lastRecord.getLevel());
 		assertEquals(
 			"dev.pimous.pu.jutils.logger.JULAdapterTest$A{f=\"f\"}",
 			bh.lastRecord.getMessage()
 		);
 		l.logC(Level.FATAL, A.class, "Ooooh there is a %d problem!", 24);
-		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
+		assertEquals(JULLevel.FATAL, bh.lastRecord.getLevel());
 		assertEquals(
 			"Ooooh there is a 24 problem!\ndev.pimous.pu.jutils.logger.JULAdapterTest$A{f=\"f\"}",
 			bh.lastRecord.getMessage()
 		);
 
 		l.logO(Level.FATAL, new A());
-		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
+		assertEquals(JULLevel.FATAL, bh.lastRecord.getLevel());
 		assertEquals(
 			"dev.pimous.pu.jutils.logger.JULAdapterTest$A(1){l=\"l\"}",
 			bh.lastRecord.getMessage()
 		);
 		l.logO(Level.FATAL, new A(), "Ooooh there is a %d problem!", 24);
-		assertEquals(java.util.logging.Level.SEVERE, bh.lastRecord.getLevel());
+		assertEquals(JULLevel.FATAL, bh.lastRecord.getLevel());
 		assertEquals(
 			"Ooooh there is a 24 problem!\ndev.pimous.pu.jutils.logger.JULAdapterTest$A(1){l=\"l\"}",
 			bh.lastRecord.getMessage()

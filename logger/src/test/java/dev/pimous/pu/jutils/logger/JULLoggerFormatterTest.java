@@ -1,15 +1,15 @@
-package dev.pimous.pu.jutils.app;
+package dev.pimous.pu.jutils.logger;
 
-import dev.pimous.pu.jutils.app.util.AppLoggerFormatter;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.time.Instant;
 import java.util.logging.*;
+import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AppLoggerFormatterTest{
+class JULLoggerFormatterTest{
 
 	@SuppressWarnings("LongLine")
 	@Test
@@ -24,7 +24,7 @@ class AppLoggerFormatterTest{
 		);
 		lr.setInstant(Instant.ofEpochSecond(1580505243, 24310120));
 
-		Formatter f = new AppLoggerFormatter(false);
+		Formatter f = new JULLoggerFormatter(false);
 		assertTrue(f.getHead(new StreamHandler()).matches(
 			"^STARTED logging at \\d{4}/\\d{2}/\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{9}:\n$"
 		));
@@ -32,12 +32,12 @@ class AppLoggerFormatterTest{
 			"^FINISHED logging at \\d{4}/\\d{2}/\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{9}\\.\n$"
 		));
 		assertTrue(f.format(lr).matches(
-			"\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[SEVERE] test\n"
+			"\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[ERROR] test\n"
 		));
 		lr.setThrown(t);
 		assertTrue(f.format(lr).matches(
 			"""
-			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[SEVERE] test
+			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[ERROR] test
 			java\\.io\\.FileNotFoundException
 			\tat dev\\.pimous\\.App\\.run\\(App\\.java:5\\)
 			"""
@@ -45,31 +45,31 @@ class AppLoggerFormatterTest{
 		lr.setMessage(null);
 		assertTrue(f.format(lr).matches(
 			"""
-			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[SEVERE] java\\.io\\.FileNotFoundException
+			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[ERROR] java\\.io\\.FileNotFoundException
 			\tat dev\\.pimous\\.App\\.run\\(App\\.java:5\\)
 			"""
 		));
 
-		f = new AppLoggerFormatter(true);
+		f = new JULLoggerFormatter(true);
 		assertTrue(f.getHead(new StreamHandler()).isEmpty());
 		assertTrue(f.getTail(new StreamHandler()).isEmpty());
 		assertTrue(f.format(lr).matches(
 			"""
-			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mSEVERE\u001b\\[0m] java\\.io\\.FileNotFoundException
+			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mERROR\u001b\\[0m] java\\.io\\.FileNotFoundException
 			\tat dev\\.pimous\\.App\\.run\\(App\\.java:5\\)
 			"""
 		));
 		lr.setMessage("test");
 		assertTrue(f.format(lr).matches(
 			"""
-			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mSEVERE\u001b\\[0m] test
+			\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mERROR\u001b\\[0m] test
 			java\\.io\\.FileNotFoundException
 			\tat dev\\.pimous\\.App\\.run\\(App\\.java:5\\)
 			"""
 		));
 		lr.setThrown(null);
 		assertTrue(f.format(lr).matches(
-			"\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mSEVERE\u001b\\[0m] test\n"
+			"\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mERROR\u001b\\[0m] test\n"
 		));
 	}
 }
