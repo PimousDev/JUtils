@@ -88,6 +88,16 @@ class ConfigSectionTest{
 			() -> tc.load(getProperties("section/testMissing.properties"))
 		);
 	}
+	@Test
+	void loadingErrorPrefixed(){
+		final TestConfig tc = new TestConfig();
+
+		assertThrows(ConfigPropertyException.class,
+			() -> tc.load(
+				getProperties("section/testMissingPrefixed.properties"), "afl"
+			)
+		);
+	}
 
 	@Test
 	void toProperties(){
@@ -95,26 +105,15 @@ class ConfigSectionTest{
 		Properties props;
 
 		props = tc.toProperties();
-		assertEquals(4, props.size());
+		assertEquals(3, props.size());
 		assertEquals("f", props.getProperty("name"));
 		assertEquals("20", props.getProperty("number"));
-		assertEquals("null", props.getProperty("version"));
+		assertNull(props.getProperty("version"));
 		assertEquals("test", props.getProperty("a"));
-
-		props = tc.toProperties("afl");
-		assertEquals(4, props.size());
-		assertEquals("f", props.getProperty("afl.name"));
-		assertEquals("20", props.getProperty("afl.number"));
-		assertEquals("null", props.getProperty("afl.version"));
-		assertEquals("test", props.getProperty("afl.a"));
 
 		props = tc.toSavedProperties();
 		assertEquals(1, props.size());
 		assertEquals("20", props.getProperty("number"));
-
-		props = tc.toSavedProperties("afl");
-		assertEquals(1, props.size());
-		assertEquals("20", props.getProperty("afl.number"));
 	}
 
 	@Test
@@ -123,10 +122,10 @@ class ConfigSectionTest{
 		Properties props;
 
 		props = tc.toProperties("afl");
-		assertEquals(4, props.size());
+		assertEquals(3, props.size());
 		assertEquals("f", props.getProperty("afl.name"));
 		assertEquals("20", props.getProperty("afl.number"));
-		assertEquals("null", props.getProperty("afl.version"));
+		assertNull(props.getProperty("afl.version"));
 		assertEquals("test", props.getProperty("afl.a"));
 
 		props = tc.toSavedProperties("afl");

@@ -115,10 +115,14 @@ public abstract class ConfigSection{
 
 		for(Field f : getFields().filter(filter).toList()){
 			final String p = getPropertyName(f);
+
 			try{
 				f.setAccessible(true); // BUG: Is this can fail?
+				final Object v = f.get(this);
+				if(v == null) continue;
+
 				props.setProperty(prefix + p,
-					getFormatter(p).apply(f.get(this)).toString()
+					getFormatter(p).apply(v).toString()
 				);
 			}catch(ReflectiveOperationException e){
 				throw new ConfigImplementationException(

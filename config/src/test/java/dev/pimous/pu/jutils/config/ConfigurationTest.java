@@ -115,10 +115,10 @@ class ConfigurationTest{
 		Properties props;
 
 		props = config.toProperties();
-		assertEquals(6, props.size());
+		assertEquals(5, props.size());
 		assertEquals("f", props.getProperty("test.name"));
 		assertEquals("20", props.getProperty("test.number"));
-		assertEquals("null", props.getProperty("test.version"));
+		assertNull(props.getProperty("test.version"));
 		assertEquals("test", props.getProperty("test.a"));
 		assertEquals("localhost/127.0.0.1", props.getProperty("socket.host"));
 		assertEquals("31000", props.getProperty("socket.port"));
@@ -145,7 +145,7 @@ class ConfigurationTest{
 		try(FileReader fis = new FileReader(FILE)){
 			final Properties props = new Properties();
 			props.load(fis);
-			assertEquals(6, props.size());
+			assertEquals(5, props.size());
 		}catch(final IOException ignored){}
 
 		config.getSection(ConfigSectionTest.TestConfig.class).number = 124;
@@ -158,7 +158,7 @@ class ConfigurationTest{
 			final Properties props = new Properties();
 			props.load(fis);
 
-			assertEquals(6, props.size());
+			assertEquals(5, props.size());
 			assertEquals("124", props.getProperty("test.number"));
 			assertEquals("31000", props.getProperty("socket.port"));
 		}catch(final IOException ignored){}
