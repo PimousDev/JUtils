@@ -60,9 +60,9 @@ public class JULLoggerFormatter extends Formatter{
 		else if(level.intValue() >=  JULLevel.NOTICE.intValue())
 			return COLORED_LEVEL_FORMAT.formatted(getLevelName(level), 2);
 		else if(level.intValue() >= JULLevel.INFORMATION.intValue())
-			return COLORED_LEVEL_FORMAT.formatted(getLevelName(level), 28);
-		else if(level.intValue() >= JULLevel.DEBUG.intValue())
 			return COLORED_LEVEL_FORMAT.formatted(getLevelName(level), 4);
+		else if(level.intValue() >= JULLevel.DEBUG.intValue())
+			return COLORED_LEVEL_FORMAT.formatted(getLevelName(level), 6);
 		else
 			return COLORED_LEVEL_FORMAT.formatted(getLevelName(level), 5);
 	}
