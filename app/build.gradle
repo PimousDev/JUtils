@@ -1,0 +1,16 @@
+plugins{
+	id "java-library"
+
+	id "jutils"
+	id "jutils.ftest"
+	id "jutils.jar.libs"
+}
+
+description = appDescription
+
+dependencies{
+	api project(":base")
+	api project(":config")
+	api project(":i18n")
+	api project(":logger")
+}

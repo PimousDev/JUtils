@@ -1,0 +1,28 @@
+sourceSets{
+	ftest{
+		compileClasspath += main.output
+		runtimeClasspath += main.output
+	}
+}
+configurations.ftestImplementation.extendsFrom(
+	configurations.testImplementation
+)
+configurations.ftestRuntimeOnly.extendsFrom(configurations.testRuntimeOnly)
+
+dependencies{
+	testImplementation platform("org.junit:junit-bom:5.10.0")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.register("ftest", Test){
+	description = "Runs functional tests."
+	group = "verification"
+	shouldRunAfter test
+
+	testClassesDirs = sourceSets.ftest.output.classesDirs
+	classpath = sourceSets.ftest.runtimeClasspath
+
+	useJUnitPlatform()
+}
+check.dependsOn tasks.ftest

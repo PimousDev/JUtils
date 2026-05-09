@@ -1,0 +1,16 @@
+def props = project.provider{ project.properties }
+processResources{
+	filesMatching("app.properties"){
+		expand(props.get() as Map<String, ?>)
+	}
+}
+
+distributions{
+    main{
+        contents{
+            from project.rootProject.file("README.md")
+            from project.rootProject.file("COPYING")
+            from project.rootProject.file("COPYING.LESSER")
+        }
+    }
+}

@@ -1,0 +1,8 @@
+jar{
+	doLast{
+		copy{
+			from jar
+			into rootProject.layout.buildDirectory.dir("libs")
+		}
+	}
+}

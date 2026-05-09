@@ -1,0 +1,28 @@
+sourceSets{
+	itest{
+		compileClasspath += main.output
+		runtimeClasspath += main.output
+	}
+}
+configurations.itestImplementation.extendsFrom(
+	configurations.testImplementation
+)
+configurations.itestRuntimeOnly.extendsFrom(configurations.testRuntimeOnly)
+
+dependencies{
+	testImplementation platform("org.junit:junit-bom:5.10.0")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+tasks.register("itest", Test){
+	description = "Runs integration tests."
+	group = "verification"
+	shouldRunAfter test
+
+	testClassesDirs = sourceSets.itest.output.classesDirs
+	classpath = sourceSets.itest.runtimeClasspath
+
+	useJUnitPlatform()
+}
+check.dependsOn tasks.itest

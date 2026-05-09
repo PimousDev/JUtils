@@ -1,0 +1,9 @@
+plugins{
+	id "java-library"
+
+	id "jutils"
+	id "jutils.ftest"
+	id "jutils.jar.libs"
+}
+
+description = baseDescription

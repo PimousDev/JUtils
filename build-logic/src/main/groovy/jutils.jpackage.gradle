@@ -1,0 +1,52 @@
+plugins{
+    id "application"
+
+    id "org.panteleyev.jpackageplugin"
+}
+
+tasks.register("prepareJPackage", Copy){
+    from(configurations.runtimeClasspath).into(
+            layout.buildDirectory.dir("jpackage")
+    )
+    from(tasks.jar).into(
+            layout.buildDirectory.dir("jpackage")
+    )
+}
+tasks.jpackage{
+    dependsOn("clean", "build", "prepareJPackage")
+
+    input = layout.buildDirectory.dir("jpackage")
+    destination = layout.buildDirectory.dir("distributions")
+
+    appDescription = project.description
+    appVersion = project.version
+    aboutUrl = projectUrl
+
+    vendor = projectVendor
+    copyright = projectCopyright
+
+    mainJar = tasks.jar.archiveFileName
+    mainClass = application.mainClass
+
+    verbose = true
+
+    linux{
+        linuxPackageName = project.name
+        linuxAppCategory = projectCategory
+        linuxMenuGroup = projectMenuGroup
+
+        linuxDebMaintainer = projectMaintainer
+        linuxRpmLicenseType = projectLicense
+
+        linuxShortcut = true
+    }
+
+    windows{
+        winHelpUrl = projectUrl
+
+        winDirChooser = true
+        winPerUserInstall = true
+        winShortcut = true
+        winShortcutPrompt = true
+    }
+}

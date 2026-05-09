@@ -1,0 +1,163 @@
+package dev.pimous.pu.jutils.config;
+
+import java.lang.annotation.*;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+/**
+ * @author APG-Gillardeau
+ * @since 1.0.0
+ */
+public abstract class ConfigSection{
+
+	public ConfigSection(){}
+
+	// GETTERS
+	private Stream<Field> getFields(){
+		return Arrays.stream(getClass().getDeclaredFields())
+			.filter(f -> f.isAnnotationPresent(ConfigField.class));
+	}
+	private static String getPropertyName(final Field field){
+		final ConfigField cf = field.getAnnotation(ConfigField.class);
+		return cf.property() != null && !cf.property().isEmpty() ?
+			cf.property() : field.getName();
+	}
+
+	public final Optional<Object> get(final String property){
+		return getFields()
+			.filter(f -> getPropertyName(f).equals(property))
+			.map(f -> {
+				try{
+					f.setAccessible(true); // BUG: Is this can fail?
+					return f.get(this);
+				}catch(Exception e){
+					throw new ConfigImplementationException(
+						"Unable to set value of %s field;"
+							.formatted(f.getName()),
+						e
+					);
+				}
+			})
+			.findFirst();
+	}
+	public final Optional<String> getString(final String property){
+		return get(property).map(String.class::cast);
+	}
+	
+	protected Function<String, ?> getParser(final String property){
+		return Function.identity();
+	}
+	protected Function<Object, CharSequence> getFormatter(
+		final String property
+	){
+		return String::valueOf;
+	}
+
+	// SETTERS
+	public final void load(final Properties properties)
+		throws ConfigPropertyException, IllegalArgumentException
+	{
+		load(properties, null);
+	}
+	public final void load(final Properties properties, final String prefix)
+		throws ConfigPropertyException, IllegalArgumentException
+	{
+		for(final Field f : getFields().toList())
+			load(properties, prefix, f);
+	}
+	private void load(final Properties properties, final String prefix,
+		 final Field field
+	) throws ConfigPropertyException, IllegalArgumentException{
+		final String p = getPropertyName(field);
+		final String lp = (
+			prefix != null ? prefix + Configuration.SECTION_DELIMITER : ""
+		) + p;
+
+		// Presence
+		if(properties.getProperty(lp) == null){
+			if(field.getAnnotation(ConfigField.class).mandatory())
+				throw new ConfigPropertyException(
+					"Property %s is mandatory but not found;".formatted(lp)
+				);
+
+			return;
+		}
+
+		// Value
+		final Object o = getParser(p).apply(properties.getProperty(lp));
+		try{
+			field.setAccessible(true); // BUG: Is this can fail?
+			field.set(this, o);
+		}catch(IllegalArgumentException e){
+			throw new ConfigImplementationException(
+				"Incompatible types between %s field and parser's return value;"
+					.formatted(field.getName()),
+				e
+			);
+		}catch(ReflectiveOperationException e){
+			throw new ConfigImplementationException(
+				"Unable to set value of %s field;".formatted(field.getName()), e
+			);
+		}
+	}
+
+	// FUNCTIONS
+	private Properties toProperties(final Predicate<Field> filter,
+		String prefix
+	){
+		final Properties props = new Properties();
+		prefix = prefix != null ? prefix + Configuration.SECTION_DELIMITER : "";
+
+		for(Field f : getFields().filter(filter).toList()){
+			final String p = getPropertyName(f);
+
+			try{
+				f.setAccessible(true); // BUG: Is this can fail?
+				final Object v = f.get(this);
+				if(v == null) continue;
+
+				props.setProperty(prefix + p,
+					getFormatter(p).apply(v).toString()
+				);
+			}catch(ReflectiveOperationException e){
+				throw new ConfigImplementationException(
+					"Unable to get value of %s field;".formatted(f.getName()),
+					e
+				);
+			}
+		}
+
+		return props;
+	}
+	public final Properties toProperties(String prefix){
+		return toProperties(_ -> true, prefix);
+	}
+	public final Properties toSavedProperties(String prefix){
+		return toProperties(
+			f -> f.getAnnotation(ConfigField.class).modifiable(),
+			prefix
+		);
+	}
+	public final Properties toProperties(){
+		return toProperties(null);
+	}
+	public final Properties toSavedProperties(){
+		return toSavedProperties(null);
+	}
+
+	// INNER CLASSES
+	@Target(ElementType.FIELD)
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	public @interface ConfigField{
+
+		String property() default "";
+		boolean mandatory() default false;
+		boolean modifiable() default false;
+	}
+}
