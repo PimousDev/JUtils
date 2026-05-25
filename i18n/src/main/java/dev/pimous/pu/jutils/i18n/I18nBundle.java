@@ -16,8 +16,6 @@ public interface I18nBundle{
 	/** @since 1.1.0 */
 	String get(final String identifier, final Object... args);
 	/** @since 1.1.0 */
-	String get(final Sentence sentence);
-	/** @since 1.1.0 */
 	String get(final Localizable localizable);
 	@Deprecated
 	String getSentence(final String identifier, final Object... args);

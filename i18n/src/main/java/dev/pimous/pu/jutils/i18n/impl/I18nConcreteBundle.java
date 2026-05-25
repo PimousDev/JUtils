@@ -50,12 +50,11 @@ public class I18nConcreteBundle implements I18nBundle{
 			.orElse(UNDEFINED_TEXT);
 	}
 	@Override
-	public String get(final Sentence sentence){
-		return get(sentence.sentence(), sentence.args());
-	}
-	@Override
 	public String get(final Localizable localizable){
-		return get(localizable.getSentence());
+		return get(
+			localizable.getSentence().sentence(),
+			localizable.getSentence().args()
+		);
 	}
 	@Deprecated
 	@Override
