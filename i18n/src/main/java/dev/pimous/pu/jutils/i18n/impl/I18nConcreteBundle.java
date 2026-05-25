@@ -2,6 +2,8 @@ package dev.pimous.pu.jutils.i18n.impl;
 
 import dev.pimous.pu.jutils.base.BadResourceException;
 import dev.pimous.pu.jutils.i18n.I18nBundle;
+import dev.pimous.pu.jutils.i18n.Localizable;
+import dev.pimous.pu.jutils.i18n.Sentence;
 import dev.pimous.pu.jutils.i18n.util.LocaleResPaths;
 
 import java.io.FileNotFoundException;
@@ -42,10 +44,23 @@ public class I18nConcreteBundle implements I18nBundle{
 			);
 	}
 	@Override
-	public String getSentence(final String identifier, final Object... args){
+	public String get(final String identifier, final Object... args){
 		return searchSentence(identifier)
 			.map(s -> args.length > 0 ? s.formatted(args) : s)
 			.orElse(UNDEFINED_TEXT);
+	}
+	@Override
+	public String get(final Sentence sentence){
+		return get(sentence.sentence(), sentence.args());
+	}
+	@Override
+	public String get(final Localizable localizable){
+		return get(localizable.getSentence());
+	}
+	@Deprecated
+	@Override
+	public String getSentence(final String identifier, final Object... args){
+		return get(identifier, args);
 	}
 	@Override
 	public String getLocalDateTime(final String identifier,

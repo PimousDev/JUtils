@@ -50,11 +50,11 @@ class I18nTest{
 		assertNull(
 			i18n.getBundle().getParent().getParent().getParent().getParent()
 		);
-		assertEquals("1", i18n.getBundle().getSentence("a"));
-		assertEquals("2", i18n.getBundle().getSentence("b"));
-		assertEquals("3", i18n.getBundle().getSentence("c"));
-		assertEquals("4", i18n.getBundle().getSentence("d"));
-		assertEquals("5", i18n.getBundle().getSentence("e"));
+		assertEquals("1", i18n.getBundle().get("a"));
+		assertEquals("2", i18n.getBundle().get("b"));
+		assertEquals("3", i18n.getBundle().get("c"));
+		assertEquals("4", i18n.getBundle().get("d"));
+		assertEquals("5", i18n.getBundle().get("e"));
 
 		final I18n erroneous = new I18n(Locale.of("en"), List.of("undefined"));
 		assertThrows(BadResourceException.class,

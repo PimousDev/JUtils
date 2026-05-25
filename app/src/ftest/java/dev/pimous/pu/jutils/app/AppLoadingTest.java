@@ -1,6 +1,5 @@
 package dev.pimous.pu.jutils.app;
 
-import dev.pimous.pu.jutils.config.ConfigPropertyException;
 import dev.pimous.pu.jutils.config.ConfigSection;
 import dev.pimous.pu.jutils.config.Configuration;
 import dev.pimous.pu.jutils.config.LocalizationConfig;

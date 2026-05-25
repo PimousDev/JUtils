@@ -34,10 +34,18 @@ class I18nConcreteBundleTest{
 		);
 
 		assertDoesNotThrow(() -> b.loadSection("bundle", Charset.defaultCharset()));
-		assertEquals("Hello my %s; Did you bring %d pops?", b.getSentence("a"));
+		assertEquals("Hello my %s; Did you bring %d pops?", b.get("a"));
 		assertEquals(
 			"Life is just a sequence of failures, sometimes strewn with forgettable successes.",
-			b.getSentence("f")
+			b.get("f")
+		);
+		assertEquals(
+			"Hello my %s; Did you bring %d pops?",
+			b.get(new Sentence("a"))
+		);
+		assertEquals(
+			"Life is just a sequence of failures, sometimes strewn with forgettable successes.",
+			b.get(new AF())
 		);
 
 		Exception e = assertThrows(BadResourceException.class,
@@ -62,15 +70,19 @@ class I18nConcreteBundleTest{
 		bParent.loadSection("parent", StandardCharsets.UTF_8);
 
 		assertEquals("Hello my darling; Did you bring 3 pops?",
-			b.getSentence("a", "darling", 3)
+			b.get("a", "darling", 3)
+		);
+		assertEquals(
+			"Hello my fiancé; Did you bring 12 pops?",
+			b.get(new Sentence("a", "fiancé", 12))
 		);
 		assertEquals(
 			"Life is just a sequence of failures, sometimes strewn with forgettable successes.",
-			b.getSentence("f")
+			b.get("f")
 		);
-		assertEquals(UNDEFINED_TEXT, b.getSentence("l"));
+		assertEquals(UNDEFINED_TEXT, b.get("l"));
 		assertEquals(
-			"Nous sommes le 31 January 2020 à 10:13 ou 10:13 am pour les algos axons (Sans oublier: 24.311311)",
+			"Nous sommes le 31 January 2020 à 10:13 ou 10:13 am pour les anglo-saxons (Sans oublier: 24.311311)",
 			b.getLocalDateTime("date",
 				LocalDateTime.of(2020, 1, 31, 10, 13, 24, 311311)
 			)
@@ -78,16 +90,22 @@ class I18nConcreteBundleTest{
 
 		b.setParent(bParent);
 		assertEquals("Hello my darling; Did you bring 3 pops?",
-			b.getSentence("a", "darling", 3)
+			b.get("a", "darling", 3)
 		);
 		assertEquals(
 			"Life is just a sequence of failures, sometimes strewn with forgettable successes.",
-			b.getSentence("f")
+			b.get("f")
 		);
-		assertEquals(
-			"Don't worry, be happy martin!",
-			b.getSentence("l", "martin")
-		);
-		assertEquals(UNDEFINED_TEXT, b.getSentence("undefined"));
+		assertEquals("Don't worry, be happy martin!", b.get("l", "martin"));
+		assertEquals(UNDEFINED_TEXT, b.get("undefined"));
+	}
+
+	// INNER CLASSES
+	private static class AF implements Localizable{
+
+		@Override
+		public Sentence getSentence(){
+			return new Sentence("f");
+		}
 	}
 }

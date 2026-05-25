@@ -85,7 +85,7 @@ public abstract class App<C extends Configuration>{
 	public C getConfig(){ return config; }
 	public I18nBundle getI18n(){ return language.getBundle(); }
 	public TimeZone getTimeZone(){ return timeZone; }
-	public Logger getLogger(){ return logger; };
+	public Logger getLogger(){ return logger; }
 	public ScheduledExecutorService getExecutor(){
 		return new ProtectedScheduledExecutor(executor);
 	}
@@ -157,7 +157,7 @@ public abstract class App<C extends Configuration>{
 
 		if(configException instanceof FileNotFoundException){
 			try{
-				config.save(getI18n().getSentence("config.comment.defaults"));
+				config.save(getI18n().get("config.comment.defaults"));
 			}catch(Exception e){
 				configDefaultsException = e;
 			}
@@ -180,32 +180,32 @@ public abstract class App<C extends Configuration>{
 		}
 
 		// Logging start
-		logger.notice(getI18n().getSentence("app.loading",
+		getLogger().notice(getI18n().get("app.loading",
 			getProperties().getName(),
 			getProperties().getIdentifier(),
 			getProperties().getVersion()
 		));
 
 		if(fhException != null)
-			logger.error(fhException,
-				getI18n().getSentence("log.error.open", getLogDir())
+			getLogger().error(fhException,
+				getI18n().get("log.error.open", getLogDir())
 			);
 
 		if(configException == null){
-			logger.notice(getI18n().getSentence("config.current",
+			getLogger().notice(getI18n().get("config.current",
 				getConfig().getFile().getAbsolutePath()
 			));
 		}else if(configException instanceof FileNotFoundException){
 			if(configDefaultsException instanceof IOException)
-				logger.error(configDefaultsException);
+				getLogger().error(configDefaultsException);
 			else
-				logger.notice(getI18n().getSentence(
+				getLogger().notice(getI18n().get(
 					"config.generated",
 					config.getFile().getAbsolutePath()
 				));
 
 			if(configReloadException != null){
-				logger.fatal(getI18n().getSentence(
+				getLogger().fatal(getI18n().get(
 					"config.error.reload",
 					getConfig().getFile().getAbsolutePath(),
 					configReloadException.getMessage()
@@ -213,7 +213,7 @@ public abstract class App<C extends Configuration>{
 				throw new RuntimeException(configReloadException);
 			}
 		}else{
-			logger.fatal(getI18n().getSentence(
+			getLogger().fatal(getI18n().get(
 				"config.error.load",
 				getConfig().getFile().getAbsolutePath(),
 				configException.getMessage()
@@ -223,11 +223,11 @@ public abstract class App<C extends Configuration>{
 
 
 		if(!languageSupported)
-			logger.warn(getI18n().getSentence("i18n.error.support",
+			getLogger().warn(getI18n().get("i18n.error.support",
 				locale, getI18n().getLocale()
 			));
 
-		logger.notice(getI18n().getSentence("i18n.current",
+		getLogger().notice(getI18n().get("i18n.current",
 			getI18n().getLocale().getDisplayName(),
 			timeZone.getID()
 		));
