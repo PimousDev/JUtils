@@ -1,7 +1,7 @@
-pluginManagement{
+pluginManagement {
 	includeBuild("build-logic")
 }
 
 rootProject.name = projectPrettyName
 
-include("base", "config", "i18n", "logger", "app")
+include("base", "config", "i18n", "logger", "app", "ui")
