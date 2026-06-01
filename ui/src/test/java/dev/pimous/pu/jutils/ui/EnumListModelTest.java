@@ -61,7 +61,7 @@ class EnumListModelTest{
 	// INNER CLASSES
 	private enum Fruits{
 		STRAWBERRY,
-		BANANA,
+		TOMATO,
 		LEMON
 	}
 
