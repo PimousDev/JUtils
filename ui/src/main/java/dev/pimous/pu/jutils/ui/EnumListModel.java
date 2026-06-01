@@ -38,9 +38,13 @@ public class EnumListModel<E extends Enum<E>> extends AbstractListModel<E>
 	// SETTERS
 	@Override
 	public void setSelectedItem(Object anItem){
-		if(!enumType.isInstance(anItem))
+		if(anItem != null && !enumType.isInstance(anItem))
 			throw new IllegalArgumentException("Incompatible item;");
+		else if(anItem == null && selection == null
+			|| anItem != null && anItem.equals(selection)
+		) return;
 
 		selection = enumType.cast(anItem);
+		fireContentsChanged(this, -1, -1); // See DefaultComboBoxModel
 	}
 }
