@@ -110,7 +110,7 @@ public abstract class Configuration{
 		load(file);
 	}
 
-	private void load(final Properties properties)
+	public void load(final Properties properties)
 		throws ConfigPropertyException, IllegalArgumentException
 	{
 		for(Map.Entry<String, ConfigSection> e : sections.entrySet()){

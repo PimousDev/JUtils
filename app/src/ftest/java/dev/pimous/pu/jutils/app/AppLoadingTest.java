@@ -20,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class AppLoadingTest{
 
 	private static final File configFile = new File("unwritten.properties");
+	private static final File defaultConfigFile = new File(
+		App.DEFAULT_CONFIG_FILENAME
+	);
 	private static ByteArrayOutputStream outCapture;
 	private static ByteArrayOutputStream errCapture;
 	private static TestApp app;
@@ -41,7 +44,6 @@ class AppLoadingTest{
 
 	@Test
 	void loadingDefaults(){
-		assertFalse(configFile.exists());
 		assertDoesNotThrow(() -> app.load(
 			new LocalizedConfig(null,
 				getProperties("system.properties"),
@@ -49,7 +51,10 @@ class AppLoadingTest{
 			),
 			false
 		));
-		assertFalse(configFile.exists());
+		// Tests when config file isn't writable.
+		assertFalse(app.getConfig().getFile().exists()
+			&& app.getConfig().getFile().delete()
+		);
 
 		assertEquals(0, outCapture.size());
 		assertTrue(errCapture.size() > 0);

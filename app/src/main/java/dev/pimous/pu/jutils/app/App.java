@@ -27,8 +27,8 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public abstract class App<C extends Configuration>{
 
-	private static final String APP_RESOURCE_FILE = "app.properties";
-	private static final String DEFAULT_CONFIG_FILENAME = "config.properties";
+	private static final String APP_RESOURCE_FILENAME = "app.properties";
+	public static final String DEFAULT_CONFIG_FILENAME = "config.properties";
 
 	private final AppConfig appConfig = new AppConfig();
 	public final InputStream in;
@@ -54,16 +54,16 @@ public abstract class App<C extends Configuration>{
 
 		// App config section
 		try(final InputStream is = ClassLoader.getSystemResourceAsStream(
-			APP_RESOURCE_FILE
+			APP_RESOURCE_FILENAME
 		)){
 			if(is == null)
-				throw new FileNotFoundException(APP_RESOURCE_FILE);
+				throw new FileNotFoundException(APP_RESOURCE_FILENAME);
 
 			final Properties props = new Properties();
 			props.load(is);
 			appConfig.load(props);
 		}catch(final IOException|ConfigPropertyException e){
-			throw new BadResourceException(APP_RESOURCE_FILE, e);
+			throw new BadResourceException(APP_RESOURCE_FILENAME, e);
 		}
 
 		// Logger
@@ -163,10 +163,10 @@ public abstract class App<C extends Configuration>{
 			}
 
 			try{
-				config.load();
+				config.load(config.toProperties());
 			}catch(ConfigPropertyException | IllegalArgumentException e){
 				configReloadException = e;
-			}catch(IOException ignored){}
+			}
 		}
 
 		// Logging without errors
@@ -197,7 +197,11 @@ public abstract class App<C extends Configuration>{
 			));
 		}else if(configException instanceof FileNotFoundException){
 			if(configDefaultsException instanceof IOException)
-				getLogger().error(configDefaultsException);
+				getLogger().error(getI18n().get(
+					"config.error.default",
+					getConfig().getFile().getAbsoluteFile(),
+					configDefaultsException.getMessage()
+				));
 			else
 				getLogger().notice(getI18n().get(
 					"config.generated",
