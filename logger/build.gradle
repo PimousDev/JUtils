@@ -5,8 +5,21 @@ plugins{
 	id "jutils.jar.libs"
 }
 
-description = loggerDescription
+description = property("logger.description")
 
 dependencies{
 	api project(":base")
+}
+
+publishing{
+	publications{
+		maven(MavenPublication){
+			from components.java
+
+			pom{
+				name = "${projectPrettyName} - Logger"
+				description = project.description
+			}
+		}
+	}
 }

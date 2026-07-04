@@ -5,8 +5,21 @@ plugins{
 	id "jutils.jar.libs"
 }
 
-description = i18nDescription
+description = property("i18n.description")
 
 dependencies{
 	api project(":base")
+}
+
+publishing{
+	publications{
+		maven(MavenPublication){
+			from components.java
+
+			pom{
+				name = "${projectPrettyName} - I18n"
+				description = project.description
+			}
+		}
+	}
 }

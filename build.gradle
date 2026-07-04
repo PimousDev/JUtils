@@ -1,3 +1,55 @@
 plugins{
 	id "jutils.root.clean"
 }
+
+subprojects{
+	apply plugin: "maven-publish"
+	apply plugin: "signing"
+
+	publishing{
+		publications{
+			maven(MavenPublication){
+				pom{
+					url = property("project.url")
+					licenses{
+						license{
+							name = property("project.license.name")
+							url = property("project.license.url")
+						}
+					}
+					organization{
+						name = property("project.org.name")
+						url = property("project.org.url")
+					}
+					developers{
+						developer{
+							id = "xibitol"
+							name = "Xibitol"
+							email = property("project.org.contact")
+						}
+					}
+					scm{
+						connection = "scm:git:git@github.com:PimousDev/JUtils.git"
+						developerConnection = "scm:git:git@github.com:PimousDev/JUtils.git"
+						url = "https://github.com/PimousDev/JUtils"
+					}
+				}
+			}
+		}
+
+		repositories{
+			maven{
+				name = "github"
+				url = "https://maven.pkg.github.com/PimousDev/JUtils"
+				credentials{
+					username = project.findProperty("jutils.xibitol-c.user")
+					password = project.findProperty("jutils.xibitol-c.pwd")
+				}
+			}
+		}
+	}
+	signing {
+		useGpgCmd()
+		sign publishing.publications.maven
+	}
+}

@@ -20,10 +20,10 @@ tasks.jpackage{
 
     appDescription = project.description
     appVersion = project.version
-    aboutUrl = projectUrl
+    aboutUrl = property("project.url")
 
-    vendor = projectVendor
-    copyright = projectCopyright
+    vendor = property("project.org.name")
+    copyright = property("project.org.copyright")
 
     mainJar = tasks.jar.archiveFileName
     mainClass = application.mainClass
@@ -32,17 +32,17 @@ tasks.jpackage{
 
     linux{
         linuxPackageName = project.name
-        linuxAppCategory = projectCategory
-        linuxMenuGroup = projectMenuGroup
+        linuxAppCategory = project("project.dist.category")
+        linuxMenuGroup = project("project.dist.menuGroup")
 
-        linuxDebMaintainer = projectMaintainer
-        linuxRpmLicenseType = projectLicense
+        linuxDebMaintainer = project("project.org.name")
+        linuxRpmLicenseType = project("project.license.name")
 
         linuxShortcut = true
     }
 
     windows{
-        winHelpUrl = projectUrl
+        winHelpUrl = property("project.url")
 
         winDirChooser = true
         winPerUserInstall = true

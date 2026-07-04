@@ -5,7 +5,7 @@ plugins{
 	id "jutils.jar.libs"
 }
 
-description = uiDescription
+description = property("ui.description")
 
 dependencies{
 	api project(":i18n")

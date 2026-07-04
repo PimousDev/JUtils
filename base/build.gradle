@@ -6,4 +6,17 @@ plugins{
 	id "jutils.jar.libs"
 }
 
-description = baseDescription
+description = property("base.description")
+
+publishing{
+	publications{
+		maven(MavenPublication){
+			from components.java
+
+			pom{
+				name = "${projectPrettyName} - Base"
+				description = project.description
+			}
+		}
+	}
+}
