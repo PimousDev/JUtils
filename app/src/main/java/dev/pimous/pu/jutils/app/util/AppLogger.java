@@ -7,6 +7,10 @@ import dev.pimous.pu.jutils.logger.JULLoggerFormatter;
 import java.io.IOException;
 import java.util.logging.*;
 
+/**
+ * @author Xibitol
+ * @since 1.0.0
+ */
 public class AppLogger extends JULAdapter{
 
 	private final Logger rootJulLogger;
