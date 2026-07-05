@@ -2,7 +2,6 @@ plugins{
 	id "java-library"
 
 	id "jutils"
-	id "jutils.jar.libs"
 }
 
 description = property("i18n.description")

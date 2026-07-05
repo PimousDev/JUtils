@@ -1,52 +1,70 @@
-plugins{
-    id "application"
+/* JUtils (Build tools and Utility libraries/classes)
+JUtils gradle build-logic v1.0.0
+Copyright © 2026 - Pimous Dev. (https://www.pimous.dev/)
 
-    id "org.panteleyev.jpackageplugin"
+These programs are free software: you can redistribute them and/or modify them
+under the terms of the GNU Lesser General Public License version 3 as published
+by the Free Software Foundation.
+
+The latters are distributed in the hope that they will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License and the GNU
+Lesser General Public License along with the programs. If not,
+see https://www.gnu.org/licenses/.
+*/
+
+plugins{
+	id "application"
+
+	id "org.panteleyev.jpackageplugin"
 }
 
 tasks.register("prepareJPackage", Copy){
-    from(configurations.runtimeClasspath).into(
-            layout.buildDirectory.dir("jpackage")
-    )
-    from(tasks.jar).into(
-            layout.buildDirectory.dir("jpackage")
-    )
+	from(configurations.runtimeClasspath).into(
+		layout.buildDirectory.dir("jpackage")
+	)
+	from(tasks.jar).into(
+		layout.buildDirectory.dir("jpackage")
+	)
 }
 tasks.jpackage{
-    dependsOn("clean", "build", "prepareJPackage")
+	dependsOn("clean", "build", "prepareJPackage")
 
-    input = layout.buildDirectory.dir("jpackage")
-    destination = layout.buildDirectory.dir("distributions")
+	input = layout.buildDirectory.dir("jpackage")
+	destination = layout.buildDirectory.dir("distributions")
 
-    appDescription = project.description
-    appVersion = project.version
-    aboutUrl = property("project.url")
+	appDescription = project.description
+	appVersion = project.version
+	aboutUrl = project.findProperty("project.url")
 
-    vendor = property("project.org.name")
-    copyright = property("project.org.copyright")
+	vendor = project.findProperty("project.org.name")
+	copyright = project.findProperty("project.org.copyright")
 
-    mainJar = tasks.jar.archiveFileName
-    mainClass = application.mainClass
+	mainJar = tasks.jar.archiveFileName
+	mainClass = application.mainClass
 
-    verbose = true
+	verbose = true
 
-    linux{
-        linuxPackageName = project.name
-        linuxAppCategory = project("project.dist.category")
-        linuxMenuGroup = project("project.dist.menuGroup")
+	linux{
+		linuxPackageName = project.name
+		linuxAppCategory = project.findProperty("project.dist.category")
+		linuxMenuGroup = project.findProperty("project.dist.menuGroup")
 
-        linuxDebMaintainer = project("project.org.name")
-        linuxRpmLicenseType = project("project.license.name")
+		linuxDebMaintainer = project.findProperty("project.org.name")
+		linuxRpmLicenseType = project.findProperty("project.license.name")
 
-        linuxShortcut = true
-    }
+		linuxShortcut = true
+	}
 
-    windows{
-        winHelpUrl = property("project.url")
+	windows{
+		winHelpUrl = project.findProperty("project.url")
 
-        winDirChooser = true
-        winPerUserInstall = true
-        winShortcut = true
-        winShortcutPrompt = true
-    }
+		winDirChooser = true
+		winPerUserInstall = true
+		winShortcut = true
+		winShortcutPrompt = true
+	}
 }

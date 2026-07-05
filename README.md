@@ -11,11 +11,24 @@ See [Project Utils](https://github.com/PimousDev/JavaUtils).
 ## Documentation
 _Soon ..._
 
-### Technician installation guide
-_Soon ..._
-
 ### Developer preparation guide
-_Soon ..._
+#### Modules
+Add JUtils GitHub Packages maven repository with the following configuration:
+```groovy
+maven{
+	name = "JUtils Github"
+	url = "https://maven.pkg.github.com/PimousDev/JUtils"
+	credentials{
+		username = project.findProperty("gpr.user")
+		password = project.findProperty("gpr.key")
+	}
+}
+```
+
+Or use the `jutils.gradle` Gradle script.
+
+#### Build-logic Gradle scripts
+Go in `build-logic/src/main/groovy/` and take all the scripts you need.
 
 ## License
 Java Utils - Project Utils (Java utility modules and libraries)  
