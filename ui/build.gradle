@@ -9,3 +9,16 @@ description = property("ui.description")
 dependencies{
 	api project(":i18n")
 }
+
+publishing{
+	publications{
+		maven(MavenPublication){
+			from components.java
+
+			pom{
+				name = "${projectPrettyName} - UI"
+				description = project.description
+			}
+		}
+	}
+}

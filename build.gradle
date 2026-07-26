@@ -42,8 +42,8 @@ subprojects{
 				name = "github"
 				url = "https://maven.pkg.github.com/PimousDev/JUtils"
 				credentials{
-					username = project.findProperty("jutils.xibitol-c.user")
-					password = project.findProperty("jutils.xibitol-c.pwd")
+					username = project.findProperty("gpr.user")
+					password = project.findProperty("gpr.key")
 				}
 			}
 		}
