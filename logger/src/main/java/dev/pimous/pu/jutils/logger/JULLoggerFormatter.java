@@ -87,8 +87,16 @@ public class JULLoggerFormatter extends Formatter{
 	public String format(LogRecord record){
 		final StringBuilder msg = new StringBuilder();
 
-		if(record.getMessage() != null)
-			msg.append(record.getMessage().formatted(record.getParameters()));
+		if(record.getMessage() != null){
+			if(record.getParameters() != null
+				&& record.getParameters().length > 0
+			)
+				record.setMessage(
+					record.getMessage().formatted(record.getParameters())
+				);
+
+			msg.append(record.getMessage());
+		}
 
 		if(record.getThrown() != null){
 			if(!msg.isEmpty())

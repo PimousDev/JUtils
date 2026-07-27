@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.logging.*;
 import java.util.logging.Level;
 
@@ -71,5 +72,20 @@ class JULLoggerFormatterTest{
 		assertTrue(f.format(lr).matches(
 			"\\(\\d+ - 2020/01/31T22:14:03.024310120\\)\\{T:3}\\[\u001b\\[1;38;5;1mERROR\u001b\\[0m] test\n"
 		));
+	}
+
+	@Test
+	void withSpecifier(){
+		final LogRecord lr = new LogRecord(
+			Level.SEVERE,
+			"test %s %%s"
+		);
+		lr.setInstant(Instant.ofEpochSecond(1580505243, 24310120));
+
+		Formatter f = new JULLoggerFormatter(false);
+		assertEquals(
+			"(0 - 2020/01/31T22:14:03.024310120){T:3}[ERROR] test %s %%s\n",
+			assertDoesNotThrow(() -> f.format(lr))
+		);
 	}
 }
