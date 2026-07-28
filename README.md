@@ -4,7 +4,7 @@ _Soon ..._
 So, these tools are usually updated when we need it. But, if you have any
 suggestion or proposal to upgrade these lasts, don't hesitate to contact us.
 
-> Version: **1.1.0-s.2**
+> Version: **1.1.0-s.3**
 
 See [Project Utils](https://github.com/PimousDev/JavaUtils).
 
