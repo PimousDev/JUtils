@@ -88,6 +88,28 @@ class JULAdapterTest{
 		);
 	}
 
+	@Test
+	void withSpecifier(){
+		final java.util.logging.Logger jul
+			= java.util.logging.Logger.getLogger("afl");
+		final BufferHandler bh = new BufferHandler(new SimpleFormatter());
+		jul.addHandler(bh);
+		final Logger l = new JULAdapter(jul);
+
+		l.fatal(new Exception("afl"), "test %s %%s");
+		assertEquals("test %s %%s", bh.lastRecord.getMessage());
+		l.fatalC(A.class, "test %s %%s");
+		assertEquals(
+			"test %s %%s\ndev.pimous.pu.jutils.logger.JULAdapterTest$A{f=\"f\"}",
+			bh.lastRecord.getMessage()
+		);
+		l.fatalO(new A(), "test %s %%s");
+		assertEquals(
+			"test %s %%s\ndev.pimous.pu.jutils.logger.JULAdapterTest$A(1){l=\"l\"}",
+			bh.lastRecord.getMessage()
+		);
+	}
+
 	// INNER CLASSES
 	private static class BufferHandler extends Handler{
 

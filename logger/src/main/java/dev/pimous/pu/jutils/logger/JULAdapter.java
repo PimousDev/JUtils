@@ -49,7 +49,11 @@ public class JULAdapter implements Logger{
 		final Throwable throwable,
 		final String message, final Object ...arguments
 	){
-		logger.log(mapLevel(level), message.formatted(arguments), throwable);
+		logger.log(
+			mapLevel(level),
+			arguments.length > 0 ? message.formatted(arguments) : message,
+			throwable
+		);
 	}
 	public void logC(final Level level, final Class<?> clazz){
 		log(level, IntrospectiveStringifier.fromAll(clazz));
@@ -59,7 +63,7 @@ public class JULAdapter implements Logger{
 		final String message, final Object ...arguments
 	){
 		log(level,
-			message.formatted(arguments)
+			(arguments.length > 0 ? message.formatted(arguments) : message)
 				+ "\n"
 				+ IntrospectiveStringifier.fromAll(clazz)
 		);
@@ -72,7 +76,7 @@ public class JULAdapter implements Logger{
 		final String message, final Object ...arguments
 	){
 		log(level,
-			message.formatted(arguments)
+			(arguments.length > 0 ? message.formatted(arguments) : message)
 				+ "\n"
 				+ IntrospectiveStringifier.fromAll(object)
 		);
