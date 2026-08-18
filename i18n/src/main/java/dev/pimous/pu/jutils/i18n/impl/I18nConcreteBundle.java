@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.NoSuchFileException;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
@@ -96,7 +97,7 @@ public class I18nConcreteBundle implements I18nBundle{
 					"%s sentence section doesn't exists for %s locale"
 						.formatted(section, locale.toLanguageTag()),
 					path,
-					new FileNotFoundException(path)
+					new NoSuchFileException(path)
 				);
 
 			sentences = new Properties(sentences);

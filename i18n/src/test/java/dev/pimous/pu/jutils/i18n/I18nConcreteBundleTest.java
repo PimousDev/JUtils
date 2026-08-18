@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.NoSuchFileException;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
@@ -51,7 +52,7 @@ class I18nConcreteBundleTest{
 		Exception e = assertThrows(BadResourceException.class,
 			() -> b.loadSection("missing", Charset.defaultCharset())
 		);
-		assertInstanceOf(FileNotFoundException.class, e.getCause());
+		assertInstanceOf(NoSuchFileException.class, e.getCause());
 		e = assertThrows(BadResourceException.class,
 			() -> b.loadSection("malformed", Charset.defaultCharset())
 		);

@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
@@ -19,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AppLoadingTest{
 
-	private static final File configFile = new File("unwritten.properties");
-	private static final File defaultConfigFile = new File(
+	private static final Path CONFIG_PATH = Path.of("unwritten.properties");
+	private static final Path DEFAULT_CONFIG_PATH = Path.of(
 		App.DEFAULT_CONFIG_FILENAME
 	);
 	private static ByteArrayOutputStream outCapture;
@@ -38,7 +40,11 @@ class AppLoadingTest{
 	}
 	@AfterEach
 	void clean(){
-		if(configFile.exists() && !configFile.delete())
+		try{
+			Files.deleteIfExists(CONFIG_PATH);
+		}catch(IOException ignored){}
+
+		if(Files.exists(CONFIG_PATH))
 			throw new RuntimeException();
 	}
 
@@ -51,9 +57,9 @@ class AppLoadingTest{
 			),
 			false
 		));
-		// Tests when config file isn't writable.
-		assertFalse(app.getConfig().getFile().exists()
-			&& app.getConfig().getFile().delete()
+		assertTrue(Files.exists(app.getConfig().getPath()));
+		assertDoesNotThrow(
+			() -> Files.deleteIfExists(app.getConfig().getPath())
 		);
 
 		assertEquals(0, outCapture.size());
@@ -62,14 +68,20 @@ class AppLoadingTest{
 		assertEquals(ZoneId.of("UTC"), app.getTimeZone().toZoneId());
 		assertTrue(app.isLoaded());
 
-		assertEquals(new File("config"), app.getConfigDir());
-		assertEquals(new File("data"), app.getDataDir());
-		assertEquals(new File("cache"), app.getCacheDir());
-		assertEquals(new File("tmp"), app.getTempDir());
-		assertEquals(new File("log"), app.getLogDir());
+		assertEquals(Path.of("config"), app.getConfigDir());
+		assertEquals(Path.of("data"), app.getDataDir());
+		assertEquals(Path.of("cache"), app.getCacheDir());
+		assertEquals(Path.of("tmp"), app.getTempDir());
+		assertEquals(Path.of("log"), app.getLogDir());
+		// TODO: All deprecated
+		assertEquals(new File("config"), app.getConfigDirFile());
+		assertEquals(new File("data"), app.getDataDirFile());
+		assertEquals(new File("cache"), app.getCacheDirFile());
+		assertEquals(new File("tmp"), app.getTempDirFile());
+		assertEquals(new File("log"), app.getLogDirFile());
 
 		assertThrowsExactly(RuntimeException.class, () -> app.load(
-			new LocalizedConfig(configFile,
+			new LocalizedConfig(CONFIG_PATH,
 				getProperties("system.properties"),
 				false
 			),
@@ -78,27 +90,33 @@ class AppLoadingTest{
 	}
 	@Test
 	void loadingDefaultsWithMandatoryUnset(){
-		assertFalse(configFile.exists());
-		assertThrowsExactly(RuntimeException.class, () -> app.load(
-			new UnsetConfig(configFile,
+		assertFalse(Files.exists(CONFIG_PATH));
+		var t = assertThrowsExactly(RuntimeException.class, () -> app.load(
+			new UnsetConfig(CONFIG_PATH,
 				getProperties("system.properties"),
 				false
 			),
 			false
 		));
-		assertTrue(configFile.exists() && configFile.delete());
+		assertTrue(Files.exists(CONFIG_PATH));
+		assertDoesNotThrow(
+			() -> Files.deleteIfExists(CONFIG_PATH)
+		);
 	}
 	@Test
 	void loadingSystem(){
-		assertFalse(configFile.exists());
+		assertFalse(Files.exists(CONFIG_PATH));
 		assertDoesNotThrow(() -> app.load(
-			new LocalizedConfig(configFile,
+			new LocalizedConfig(CONFIG_PATH,
 				getProperties("system.properties"),
 				true
 			),
 			true
 		));
-		assertTrue(configFile.exists() && configFile.delete());
+		assertTrue(Files.exists(app.getConfig().getPath()));
+		assertDoesNotThrow(
+			() -> Files.deleteIfExists(app.getConfig().getPath())
+		);
 
 		assertTrue(outCapture.size() > 0);
 		assertTrue(errCapture.size() > 0);
@@ -108,24 +126,27 @@ class AppLoadingTest{
 	}
 	@Test
 	void loadingConfig() throws IOException{
-		if(!configFile.createNewFile())
-			throw new RuntimeException();
+		assertDoesNotThrow(() -> Files.createFile(CONFIG_PATH));
+		assertTrue(Files.exists(CONFIG_PATH));
 
-		final FileWriter fw = new FileWriter(configFile);
-		getProperties("config.properties").store(fw, "");
-		fw.close();
+		final var bf = Files.newBufferedWriter(CONFIG_PATH);
+		getProperties("config.properties").store(bf, "");
+		bf.close();
 
 		app.setLoggingLevel(Level.FATAL);
 
-		assertTrue(configFile.exists());
+		assertTrue(Files.exists(CONFIG_PATH));
 		assertDoesNotThrow(() -> app.load(
-			new LocalizedConfig(configFile,
+			new LocalizedConfig(CONFIG_PATH,
 				getProperties("system.properties"),
 				true
 			),
 			true
 		));
-		assertTrue(configFile.exists() && configFile.delete());
+		assertTrue(Files.exists(app.getConfig().getPath()));
+		assertDoesNotThrow(
+			() -> Files.deleteIfExists(app.getConfig().getPath())
+		);
 
 		assertFalse(outCapture.toString().contains("INFO"));
 		assertFalse(errCapture.toString().contains("INFO"));
@@ -173,13 +194,13 @@ class AppLoadingTest{
 	}
 	private static class LocalizedConfig extends Configuration{
 
-		public LocalizedConfig(final File file,
+		public LocalizedConfig(final Path path,
 			final Properties system,
 			final boolean isLocalized
 		){
 			super(system);
 
-			setFile(file);
+			setPath(path);
 
 			if(isLocalized)
 				addSection("locale", new LocalizationConfig(getSystem(),
@@ -189,11 +210,11 @@ class AppLoadingTest{
 	}
 	private static class UnsetConfig extends LocalizedConfig{
 
-		public UnsetConfig(final File file,
+		public UnsetConfig(final Path path,
 		                       final Properties system,
 		                       final boolean isLocalized
 		){
-			super(file, system, isLocalized);
+			super(path, system, isLocalized);
 
 			addSection("unset", new UnsetSectionConfig());
 		}

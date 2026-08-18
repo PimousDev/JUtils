@@ -7,7 +7,9 @@ import java.io.*;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -116,6 +118,17 @@ class ConfigurationTest{
 				"config/serverUndefined.properties"
 			)
 		));
+	}
+
+	@Test
+	void filesystemException(){
+		final ServerConfig config = new ServerConfig(
+			getProperties("config/system.properties"), env
+		);
+
+		config.setPath(PATH);
+		var e = assertThrows(IOException.class, () -> config.load());
+		assertInstanceOf(NoSuchFileException.class, e.getCause());
 	}
 
 	@Test

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,46 +20,86 @@ class DirectoriesTest{
 			new DummyConfig(getProperties("system/dirs.properties")),
 			true
 		);
-		assertEquals(new File("config"), dirs.getGlobalConfigDir());
-		assertEquals(new File("data"), dirs.getGlobalDataDir());
-		assertEquals(new File("cache"), dirs.getGlobalCacheDir());
-		assertEquals(new File("tmp"), dirs.getGlobalTempDir());
-		assertEquals(new File("log"), dirs.getGlobalLogDir());
-		assertEquals(new File("config"), dirs.getConfigDir("afl"));
-		assertEquals(new File("data"), dirs.getDataDir("afl"));
-		assertEquals(new File("cache"), dirs.getCacheDir("afl"));
-		assertEquals(new File("tmp"), dirs.getTempDir("afl"));
-		assertEquals(new File("log"), dirs.getLogDir("afl"));
+		assertEquals(Path.of("config"), dirs.getGlobalConfigDir());
+		assertEquals(Path.of("data"), dirs.getGlobalDataDir());
+		assertEquals(Path.of("cache"), dirs.getGlobalCacheDir());
+		assertEquals(Path.of("tmp"), dirs.getGlobalTempDir());
+		assertEquals(Path.of("log"), dirs.getGlobalLogDir());
+		assertEquals(Path.of("config"), dirs.getConfigDir("afl"));
+		assertEquals(Path.of("data"), dirs.getDataDir("afl"));
+		assertEquals(Path.of("cache"), dirs.getCacheDir("afl"));
+		assertEquals(Path.of("tmp"), dirs.getTempDir("afl"));
+		assertEquals(Path.of("log"), dirs.getLogDir("afl"));
+
+		// TODO: All deprecated
+		assertEquals(new File("config"), dirs.getGlobalConfigDirFile());
+		assertEquals(new File("data"), dirs.getGlobalDataDirFile());
+		assertEquals(new File("cache"), dirs.getGlobalCacheDirFile());
+		assertEquals(new File("tmp"), dirs.getGlobalTempDirFile());
+		assertEquals(new File("log"), dirs.getGlobalLogDirFile());
+		assertEquals(new File("config"), dirs.getConfigDirFile("afl"));
+		assertEquals(new File("data"), dirs.getDataDirFile("afl"));
+		assertEquals(new File("cache"), dirs.getCacheDirFile("afl"));
+		assertEquals(new File("tmp"), dirs.getTempDirFile("afl"));
+		assertEquals(new File("log"), dirs.getLogDirFile("afl"));
 
 		dirs = new LinuxDirs(
 			new DummyConfig(getProperties("system/linuxDirs.properties")),
 			false
 		);
-		assertEquals(new File("undefined/home/.config"),
+		assertEquals(Path.of("undefined/home/.config"),
 			dirs.getGlobalConfigDir()
 		);
-		assertEquals(new File("undefined/home/.local/share"),
+		assertEquals(Path.of("undefined/home/.local/share"),
 			dirs.getGlobalDataDir()
 		);
-		assertEquals(new File("undefined/home/.cache"),
+		assertEquals(Path.of("undefined/home/.cache"),
 			dirs.getGlobalCacheDir()
 		);
-		assertEquals(new File("undefined/tmp"), dirs.getGlobalTempDir());
-		assertEquals(new File("undefined/home/.local/share"),
+		assertEquals(Path.of("undefined/tmp"), dirs.getGlobalTempDir());
+		assertEquals(Path.of("undefined/home/.local/share"),
 			dirs.getGlobalLogDir()
 		);
-		assertEquals(new File("undefined/home/.config/afl"),
+		assertEquals(Path.of("undefined/home/.config/afl"),
 			dirs.getConfigDir("afl")
 		);
-		assertEquals(new File("undefined/home/.local/share/afl/data"),
+		assertEquals(Path.of("undefined/home/.local/share/afl/data"),
 			dirs.getDataDir("afl")
 		);
-		assertEquals(new File("undefined/home/.cache/afl"),
+		assertEquals(Path.of("undefined/home/.cache/afl"),
 			dirs.getCacheDir("afl")
 		);
-		assertEquals(new File("undefined/tmp/afl"), dirs.getTempDir("afl"));
-		assertEquals(new File("undefined/home/.local/share/afl/log"),
+		assertEquals(Path.of("undefined/tmp/afl"), dirs.getTempDir("afl"));
+		assertEquals(Path.of("undefined/home/.local/share/afl/log"),
 			dirs.getLogDir("afl")
+		);
+
+		// TODO: All deprecated
+		assertEquals(new File("undefined/home/.config"),
+			dirs.getGlobalConfigDirFile()
+		);
+		assertEquals(new File("undefined/home/.local/share"),
+			dirs.getGlobalDataDirFile()
+		);
+		assertEquals(new File("undefined/home/.cache"),
+			dirs.getGlobalCacheDirFile()
+		);
+		assertEquals(new File("undefined/tmp"), dirs.getGlobalTempDirFile());
+		assertEquals(new File("undefined/home/.local/share"),
+			dirs.getGlobalLogDirFile()
+		);
+		assertEquals(new File("undefined/home/.config/afl"),
+			dirs.getConfigDirFile("afl")
+		);
+		assertEquals(new File("undefined/home/.local/share/afl/data"),
+			dirs.getDataDirFile("afl")
+		);
+		assertEquals(new File("undefined/home/.cache/afl"),
+			dirs.getCacheDirFile("afl")
+		);
+		assertEquals(new File("undefined/tmp/afl"), dirs.getTempDirFile("afl"));
+		assertEquals(new File("undefined/home/.local/share/afl/log"),
+			dirs.getLogDirFile("afl")
 		);
 	}
 

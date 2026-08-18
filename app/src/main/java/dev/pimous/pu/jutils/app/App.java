@@ -13,7 +13,9 @@ import dev.pimous.pu.jutils.logger.Logger;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -140,7 +142,7 @@ public abstract class App<C extends Configuration>{
 		// Configuration without errors
 		this.config = config;
 		dirs = Directories.create(config);
-		Exception configException = null;
+		Throwable configException = null;
 
 		if(config.getPath() == null)
 			config.setPath(getConfigDir().resolve(DEFAULT_CONFIG_FILENAME));
@@ -149,24 +151,6 @@ public abstract class App<C extends Configuration>{
 			config.load();
 		}catch(Exception e){
 			configException = e;
-		}
-
-		// Configuration defaults without errors
-		Exception configDefaultsException = null;
-		Exception configReloadException = null;
-
-		if(configException instanceof FileNotFoundException){
-			try{
-				config.save(getI18n().get("config.comment.defaults"));
-			}catch(Exception e){
-				configDefaultsException = e;
-			}
-
-			try{
-				config.load(config.toProperties());
-			}catch(ConfigPropertyException | IllegalArgumentException e){
-				configReloadException = e;
-			}
 		}
 
 		// I18n from defaults and system
@@ -185,6 +169,26 @@ public abstract class App<C extends Configuration>{
 
 		if(!language.load(locale, Charset.defaultCharset()).equals(locale))
 			languageSupported = false;
+
+		// Configuration defaults without errors
+		Throwable configDefaultsException = null;
+		Throwable configReloadException = null;
+
+		if(configException != null
+			&& configException.getCause() instanceof NoSuchFileException
+		){
+			try{
+				config.save(getI18n().get("config.comment.defaults"));
+			}catch(Exception e){
+				configDefaultsException = e;
+			}
+
+			try{
+				config.load(config.toProperties());
+			}catch(ConfigPropertyException | IllegalArgumentException e){
+				configReloadException = e;
+			}
+		}
 
 		// Logging without errors
 		logger.loadConsoleHandlers(this, hasGUI);
@@ -212,8 +216,8 @@ public abstract class App<C extends Configuration>{
 			getLogger().notice(getI18n().get("config.current",
 				getConfig().getPath().toAbsolutePath()
 			));
-		}else if(configException instanceof FileNotFoundException){
-			if(configDefaultsException instanceof IOException)
+		}else if(configException.getCause() instanceof NoSuchFileException){
+			if(configDefaultsException != null)
 				getLogger().error(getI18n().get(
 					"config.error.default",
 					getConfig().getPath().toAbsolutePath(),

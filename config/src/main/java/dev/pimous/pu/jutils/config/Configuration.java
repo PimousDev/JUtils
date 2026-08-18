@@ -2,8 +2,7 @@ package dev.pimous.pu.jutils.config;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -157,19 +156,17 @@ public abstract class Configuration{
 	{
 		try(var fis = Files.newInputStream(path)){
 			load(fis);
-		}catch(final FileNotFoundException e){
-			final var except = new FileNotFoundException(
-				"No such configuration file at %s;".formatted(
-					path.toAbsolutePath()
-				)
-			);
-			except.addSuppressed(e);
-
-			throw except;
 		}catch(final IOException e){
+			var msg = e.getMessage();
+
+			if(e instanceof NoSuchFileException)
+				msg = "No such file";
+			if(e instanceof AccessDeniedException)
+				msg = "File inaccessible or unreadable";
+
 			throw new IOException(
 				"Cannot open configuration file at %s (%s);".formatted(
-					path.toAbsolutePath(), e.getMessage()
+					path.toAbsolutePath(), msg
 				), e
 			);
 		}
