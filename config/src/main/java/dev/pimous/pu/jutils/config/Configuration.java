@@ -2,6 +2,8 @@ package dev.pimous.pu.jutils.config;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -20,7 +22,7 @@ public abstract class Configuration{
 		"^(?<section>[^.]+)\\.(?<property>.+)$"
 	);
 
-	private File file = null;
+	private Path path = null;
 	private final Map<String, ConfigSection> sections;
 	private final SystemConfig system;
 	private final Properties env = new Properties();
@@ -38,7 +40,10 @@ public abstract class Configuration{
 	}
 
 	// GETTERS
-	public File getFile(){ return file; }
+	@Deprecated
+	public File getFile(){ return path != null ? path.toFile() : null; }
+	/** @since 1.1.0 */
+	public Path getPath(){ return path; }
 	public <S extends ConfigSection> boolean hasSection(
 		final Class<S> sectionClass
 	){
@@ -72,8 +77,13 @@ public abstract class Configuration{
 	}
 
 	// SETTERS
+	@Deprecated
 	public void setFile(final File file){
-		this.file = file;
+		this.path = file.toPath();
+	}
+	/** @since 1.1.0 */
+	public void setPath(final Path path){
+		this.path = path;
 	}
 	protected void addSection(final String name, final ConfigSection section){
 		if(name.contains(String.valueOf(SECTION_DELIMITER)))
@@ -104,10 +114,10 @@ public abstract class Configuration{
 	public void load() throws
 		ConfigPropertyException, IllegalArgumentException, IOException
 	{
-		if(file == null)
-			throw new RuntimeException("file isn't defined;");
+		if(path == null)
+			throw new RuntimeException("path isn't defined;");
 
-		load(file);
+		load(path);
 	}
 
 	public void load(final Properties properties)
@@ -141,15 +151,16 @@ public abstract class Configuration{
 
 		load(props);
 	}
-	private void load(final File file) throws
+	/** @since 1.1.0 */
+	private void load(final Path path) throws
 		ConfigPropertyException, IllegalArgumentException, IOException
 	{
-		try(FileInputStream fis = new FileInputStream(file)){
+		try(var fis = Files.newInputStream(path)){
 			load(fis);
 		}catch(final FileNotFoundException e){
-			final FileNotFoundException except = new FileNotFoundException(
+			final var except = new FileNotFoundException(
 				"No such configuration file at %s;".formatted(
-					file.getAbsolutePath()
+					path.toAbsolutePath()
 				)
 			);
 			except.addSuppressed(e);
@@ -158,10 +169,16 @@ public abstract class Configuration{
 		}catch(final IOException e){
 			throw new IOException(
 				"Cannot open configuration file at %s (%s);".formatted(
-					file.getAbsolutePath(), e.getMessage()
+					path.toAbsolutePath(), e.getMessage()
 				), e
 			);
 		}
+	}
+	@Deprecated
+	private void load(final File file) throws
+		ConfigPropertyException, IllegalArgumentException, IOException
+	{
+		load(file.toPath());
 	}
 
 	// FUNCTIONS
@@ -185,19 +202,21 @@ public abstract class Configuration{
 
 		// Creates file (and loads initial configuration if exists)
 		try{
-			if(file.createNewFile())
+			if(!Files.exists(path)){
+				Files.createFile(path);
 				props = toProperties();
-			else{
+			}else{
 				props = new Properties();
 
-				try(FileReader fis = new FileReader(file,
+				try(var fis = Files.newBufferedReader(path,
 					Charset.defaultCharset()
 				)){
 					props.load(fis);
 				}catch(final IOException e){
 					throw new IOException(
-						"Cannot read configuration file at %s;".formatted(file),
-						e
+						"Cannot read configuration file at %s;".formatted(
+							path.toAbsolutePath()
+						), e
 					);
 				}
 
@@ -205,16 +224,20 @@ public abstract class Configuration{
 			}
 		}catch(final IOException e){
 			throw new IOException(
-				"Cannot create configuration file at %s;".formatted(file), e
+				"Cannot create configuration file at %s;".formatted(
+					path.toAbsolutePath()
+				), e
 			);
 		}
 
 		// Saves configuration
-		try(FileWriter fos = new FileWriter(file, Charset.defaultCharset())){
+		try(var fos = Files.newBufferedWriter(path, Charset.defaultCharset())){
 			props.store(fos, comments);
 		}catch(final IOException e){
 			throw new IOException(
-				"Cannot write configuration file at %s;".formatted(file), e
+				"Cannot write configuration file at %s;".formatted(
+					path.toAbsolutePath()
+				), e
 			);
 		}
 	}

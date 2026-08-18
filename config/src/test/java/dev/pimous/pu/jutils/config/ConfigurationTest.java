@@ -7,6 +7,8 @@ import java.io.*;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -16,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigurationTest{
 
-	public static final File FILE = new File("server.properties");
+	public static final Path PATH = Path.of("server.properties");
 
 	final Map<String, String> env = Map.of(
 		"java.io.tmpdir", "tmp/"
@@ -24,7 +26,11 @@ class ConfigurationTest{
 
 	@BeforeEach
 	void deleteFile(){
-		if(FILE.exists() && !FILE.delete())
+		try{
+			Files.deleteIfExists(PATH);
+		}catch(IOException ignored){}
+
+		if(Files.exists(PATH))
 			throw new RuntimeException();
 	}
 
@@ -34,9 +40,12 @@ class ConfigurationTest{
 			getProperties("config/system.properties"), env
 		);
 
-		assertNull(config.getFile());
-		config.setFile(FILE);
-		assertEquals(FILE, config.getFile());
+		assertNull(config.getPath());
+		assertNull(config.getFile()); // TODO: Deprecated
+		config.setPath(PATH);
+		assertEquals(PATH, config.getPath());
+		config.setFile(PATH.toFile()); // TODO: Deprecated
+		assertEquals(PATH.toFile(), config.getFile()); // TODO: Deprecated
 
 		assertTrue(config.hasSection(ConfigSectionTest.TestConfig.class));
 		assertFalse(config.hasSection(DummyConfig.class));
@@ -66,8 +75,10 @@ class ConfigurationTest{
 		);
 
 		assertEquals("GillardeauOS", config.getSystem().getOSName());
-		assertEquals(new File("."), config.getSystem().getHome());
-		assertEquals(new File("."), config.getSystem().getWorkingDir());
+		assertEquals(Path.of("."), config.getSystem().getHome());
+		assertEquals(new File("."), config.getSystem().getHomeFile()); // TODO: Deprecated
+		assertEquals(Path.of("."), config.getSystem().getWorkingDir());
+		assertEquals(new File("."), config.getSystem().getWorkingDirFile()); // TODO: Deprecated
 
 		assertEquals(env.get("java.io.tmpdir"),
 			config.getEnv("java.io.tmpdir", "test")
@@ -136,27 +147,27 @@ class ConfigurationTest{
 
 		assertThrows(RuntimeException.class, () -> config.save(""));
 
-		config.setFile(FILE);
+		config.setPath(PATH);
 
-		assertFalse(FILE.exists());
+		assertFalse(Files.exists(PATH));
 		assertDoesNotThrow(() -> config.save(""));
-		assertTrue(FILE.exists());
-		assertTrue(FILE.length() > 0);
-		try(FileReader fis = new FileReader(FILE)){
+		assertTrue(Files.exists(PATH));
+		assertDoesNotThrow(() -> assertTrue(Files.size(PATH) > 0));
+		try(BufferedReader fbr = Files.newBufferedReader(PATH)){
 			final Properties props = new Properties();
-			props.load(fis);
+			props.load(fbr);
 			assertEquals(5, props.size());
 		}catch(final IOException ignored){}
 
 		config.getSection(ConfigSectionTest.TestConfig.class).number = 124;
 		config.getSection(SocketConfig.class).port = 31012;
 
-		final long oldLength = FILE.length();
+		final long oldLength = assertDoesNotThrow(() -> Files.size(PATH));
 		assertDoesNotThrow(() -> config.save(""));
-		assertEquals(oldLength + 1, FILE.length());
-		try(FileReader fis = new FileReader(FILE)){
+		assertEquals(oldLength + 1, assertDoesNotThrow(() -> Files.size(PATH)));
+		try(BufferedReader fbr = Files.newBufferedReader(PATH)){
 			final Properties props = new Properties();
-			props.load(fis);
+			props.load(fbr);
 
 			assertEquals(5, props.size());
 			assertEquals("124", props.getProperty("test.number"));

@@ -3,6 +3,7 @@ package dev.pimous.pu.jutils.config;
 import dev.pimous.pu.jutils.base.InternalException;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
@@ -17,9 +18,9 @@ public final class SystemConfig extends ConfigSection{
 	private String osName;
 
 	@ConfigField(property="user.dir", mandatory=true)
-	private File workingDir;
+	private Path workingDir;
 	@ConfigField(property="user.home", mandatory=true)
-	private File home;
+	private Path home;
 	@ConfigField(property="user.language")
 	private String language;
 	@ConfigField(property="user.country")
@@ -28,7 +29,7 @@ public final class SystemConfig extends ConfigSection{
 	private String timezone;
 
 	@ConfigField(property="java.io.tmpdir", mandatory=true)
-	private File tmpdir;
+	private Path tmpdir;
 
 	public SystemConfig(final Properties properties){
 		try{
@@ -42,15 +43,21 @@ public final class SystemConfig extends ConfigSection{
 	@Override
 	protected Function<String, ?> getParser(String property){
 		return switch(property){
-			case "user.dir", "user.home", "java.io.tmpdir" -> File::new;
+			case "user.dir", "user.home", "java.io.tmpdir" -> Path::of;
 			default -> super.getParser(property);
 		};
 	}
 
 	public String getOSName(){ return osName; }
 
-	public File getWorkingDir(){ return workingDir; }
-	public File getHome(){ return home; }
+	@Deprecated
+	public File getWorkingDirFile(){ return workingDir.toFile(); }
+	/** @since 1.1.0 */
+	public Path getWorkingDir(){ return workingDir; }
+	@Deprecated
+	public File getHomeFile(){ return home.toFile(); }
+	/** @since 1.1.0 */
+	public Path getHome(){ return home; }
 	public Optional<String> getLanguage(){
 		return Optional.ofNullable(language);
 	}
@@ -61,5 +68,8 @@ public final class SystemConfig extends ConfigSection{
 		return Optional.ofNullable(timezone);
 	}
 
-	public File getTmpDir(){ return this.tmpdir; }
+	@Deprecated
+	public File getTmpDirFile(){ return this.tmpdir.toFile(); }
+	/** @since 1.1.0 */
+	public Path getTmpDir(){ return this.tmpdir; }
 }
