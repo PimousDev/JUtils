@@ -151,23 +151,6 @@ public abstract class App<C extends Configuration>{
 			configException = e;
 		}
 
-		// I18n from defaults and system
-		this.language = language;
-		Locale locale = language.defaultLocale;
-		timeZone = TimeZone.getTimeZone(ZoneOffset.UTC);
-		boolean languageSupported = true;
-
-		if(config.hasSection(LocalizationConfig.class)){
-			final LocalizationConfig lc = config.getSection(
-				LocalizationConfig.class
-			);
-			locale = lc.getLocale();
-			timeZone = lc.getTimeZone();
-		}
-
-		if(!language.load(locale, Charset.defaultCharset()).equals(locale))
-			languageSupported = false;
-
 		// Configuration defaults without errors
 		Exception configDefaultsException = null;
 		Exception configReloadException = null;
@@ -185,6 +168,23 @@ public abstract class App<C extends Configuration>{
 				configReloadException = e;
 			}
 		}
+
+		// I18n from defaults and system
+		this.language = language;
+		Locale locale = language.defaultLocale;
+		timeZone = TimeZone.getTimeZone(ZoneOffset.UTC);
+		boolean languageSupported = true;
+
+		if(config.hasSection(LocalizationConfig.class)){
+			final LocalizationConfig lc = config.getSection(
+				LocalizationConfig.class
+			);
+			locale = lc.getLocale();
+			timeZone = lc.getTimeZone();
+		}
+
+		if(!language.load(locale, Charset.defaultCharset()).equals(locale))
+			languageSupported = false;
 
 		// Logging without errors
 		logger.loadConsoleHandlers(this, hasGUI);
