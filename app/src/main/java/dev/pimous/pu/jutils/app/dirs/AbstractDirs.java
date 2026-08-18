@@ -2,8 +2,12 @@ package dev.pimous.pu.jutils.app.dirs;
 
 import dev.pimous.pu.jutils.app.Directories;
 import dev.pimous.pu.jutils.config.Configuration;
+import dev.pimous.pu.jutils.logger.JULAdapter;
+import dev.pimous.pu.jutils.logger.Logger;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -12,11 +16,15 @@ import java.nio.file.Path;
  */
 public abstract class AbstractDirs implements Directories{
 
-	protected static final String CONFIG_DIR = "config";
-	protected static final String DATA_DIR = "data";
-	protected static final String CACHE_DIR = "cache";
-	protected static final String TEMP_DIR = "tmp";
-	protected static final String LOG_DIR = "log";
+	private static final Logger LOGGER = new JULAdapter(
+		AbstractDirs.class.getName()
+	);
+
+	protected static final Path CONFIG_DIR = Path.of("config");
+	protected static final Path DATA_DIR = Path.of("data");
+	protected static final Path CACHE_DIR = Path.of("cache");
+	protected static final Path TEMP_DIR = Path.of("tmp");
+	protected static final Path LOG_DIR = Path.of("log");
 
 	private final Configuration config;
 	private final boolean shouldDirsExist;
@@ -32,14 +40,20 @@ public abstract class AbstractDirs implements Directories{
 	protected Configuration getConfig(){ return config; }
 	protected boolean shouldDirsBeMade(){ return !shouldDirsExist; }
 	protected Path getHomeDir(){
-		return config.getSystem().getHome().toPath();
+		return config.getSystem().getHome();
 	}
 
 	// SETTERS
+	/** @since 1.1.0 */
+	protected void makeDir(final Path parent, final Path full){
+		try{
+			Files.createDirectory(full);
+		}catch(IOException e){
+			LOGGER.warn("Unable to create %s directory;".formatted(full), e);
+		}
+	}
+	@Deprecated
 	protected void makeDir(final File parent, final File full){
-		if(parent.exists() && !full.exists() && !full.mkdirs())
-			throw new RuntimeException(
-				"Unable to create %s directory;".formatted(full)
-			);
+		makeDir(parent.toPath(), full.toPath());
 	}
 }

@@ -11,88 +11,144 @@ import java.nio.file.Path;
  */
 public class LinuxDirs extends AbstractDirs{
 
-	private static final String GLOBAL_CONFIG_DIR = ".config";
-	private static final String GLOBAL_SHARE_DIR = ".local/share";
-	private static final String GLOBAL_CACHE_DIR = ".cache";
+	private static final Path GLOBAL_CONFIG_DIR = Path.of(".config");
+	private static final Path GLOBAL_SHARE_DIR = Path.of(".local/share");
+	private static final Path GLOBAL_CACHE_DIR = Path.of(".cache");
 
 	public LinuxDirs(final Configuration config, final boolean shouldDirsExist){
 		super(config, shouldDirsExist);
 	}
 
 	// GETTERS
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalConfigDir(){
-		return new File(getHomeDir().toFile(), GLOBAL_CONFIG_DIR);
+	public Path getGlobalConfigDir(){
+		return getHomeDir().resolve(GLOBAL_CONFIG_DIR);
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getConfigDir(final String identifier){
-		final File parent = getGlobalConfigDir();
-		final File full = new File(parent, identifier);
+	public Path getConfigDir(final String identifier){
+		final var parent = getGlobalConfigDir();
+		final var full = parent.resolve(identifier);
 
 		if(shouldDirsBeMade())
 			makeDir(parent, full);
 
 		return full;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalDataDir(){
-		return new File(getHomeDir().toFile(), GLOBAL_SHARE_DIR);
+	public Path getGlobalDataDir(){
+		return getHomeDir().resolve(GLOBAL_SHARE_DIR);
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getDataDir(final String identifier){
-		final File parent = getGlobalDataDir();
-		final File full = Path.of(
-			parent.toString(), identifier, DATA_DIR
-		).toFile();
+	public Path getDataDir(final String identifier){
+		final var parent = getGlobalDataDir();
+		final var full = parent.resolve(identifier).resolve(DATA_DIR);
 
 		if(shouldDirsBeMade())
 			makeDir(parent, full);
 
 		return full;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalCacheDir(){
-		return new File(getHomeDir().toFile(), GLOBAL_CACHE_DIR);
+	public Path getGlobalCacheDir(){
+		return getHomeDir().resolve(GLOBAL_CACHE_DIR);
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getCacheDir(final String identifier){
-		final File parent = getGlobalCacheDir();
-		final File full = new File(parent, identifier);
+	public Path getCacheDir(final String identifier){
+		final var parent = getGlobalCacheDir();
+		final var full = parent.resolve(identifier);
 
 		if(shouldDirsBeMade())
 			makeDir(parent, full);
 
 		return full;
 	}
-
+	@Deprecated
 	@Override
-	public File getGlobalTempDir(){
+	public File getGlobalConfigDirFile(){
+		return getGlobalConfigDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getConfigDirFile(final String identifier){
+		return getConfigDir(identifier).toFile();
+	}
+	@Deprecated
+	@Override
+	public File getGlobalDataDirFile(){
+		return getGlobalDataDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getDataDirFile(final String identifier){
+		return getDataDir(identifier).toFile();
+	}
+	@Deprecated
+	@Override
+	public File getGlobalCacheDirFile(){
+		return getGlobalCacheDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getCacheDirFile(final String identifier){
+		return getCacheDir(identifier).toFile();
+	}
+
+	/** @since 1.1.0 */
+	@Override
+	public Path getGlobalTempDir(){
 		return getConfig().getSystem().getTmpDir();
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getTempDir(final String identifier){
-		final File parent = getGlobalTempDir();
-		final File full = new File(parent, identifier);
+	public Path getTempDir(final String identifier){
+		final var parent = getGlobalTempDir();
+		final var full = parent.resolve(identifier);
 
 		if(shouldDirsBeMade())
 			makeDir(parent, full);
 
 		return full;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalLogDir(){
-		return new File(getHomeDir().toFile(), GLOBAL_SHARE_DIR);
+	public Path getGlobalLogDir(){
+		return getHomeDir().resolve(GLOBAL_SHARE_DIR);
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getLogDir(final String identifier){
-		File parent = getGlobalLogDir();
-		final File full = Path.of(
-			parent.toString(), identifier, LOG_DIR
-		).toFile();
+	public Path getLogDir(final String identifier){
+		final var parent = getGlobalLogDir();
+		final var full = parent.resolve(identifier).resolve(LOG_DIR);
 
 		if(shouldDirsBeMade())
 			makeDir(parent, full);
 
 		return full;
+	}
+	@Deprecated
+	@Override
+	public File getGlobalTempDirFile(){
+		return getGlobalTempDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getTempDirFile(final String identifier){
+		return getTempDir(identifier).toFile();
+	}
+	@Deprecated
+	@Override
+	public File getGlobalLogDirFile(){
+		return getGlobalLogDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getLogDirFile(final String identifier){
+		return getLogDir(identifier).toFile();
 	}
 }

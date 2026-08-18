@@ -2,8 +2,8 @@ package dev.pimous.pu.jutils.app.util;
 
 import dev.pimous.pu.jutils.app.App;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.logging.FileHandler;
 
 /**
@@ -20,12 +20,9 @@ public class AppFileHandler extends FileHandler{
 		throws IOException
 	{
 		super(
-			new File(
-				context.getLogDir(),
-				LOG_FILE_NAME_FORMAT.formatted(
-					context.getProperties().getIdentifier()
-				)
-			).toString(),
+			context.getLogDir().resolve(LOG_FILE_NAME_FORMAT.formatted(
+				context.getProperties().getIdentifier()
+			)).toString(),
 			LOG_FILE_SIZE_MAX,
 			LOG_FILE_COUNT_MAX,
 			false

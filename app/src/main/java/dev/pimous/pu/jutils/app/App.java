@@ -13,6 +13,8 @@ import dev.pimous.pu.jutils.logger.Logger;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Locale;
@@ -96,11 +98,26 @@ public abstract class App<C extends Configuration>{
 		return executor.shutdownNow();
 	}
 
-	public File getConfigDir(){ return dirs.getConfigDir(getIdentifier()); }
-	public File getDataDir(){ return dirs.getDataDir(getIdentifier()); }
-	public File getCacheDir(){ return dirs.getCacheDir(getIdentifier()); }
-	public File getTempDir(){ return dirs.getTempDir(getIdentifier()); }
-	public File getLogDir(){ return dirs.getLogDir(getIdentifier()); }
+	/** @since 1.1.0 */
+	public Path getConfigDir(){ return dirs.getConfigDir(getIdentifier()); }
+	/** @since 1.1.0 */
+	public Path getDataDir(){ return dirs.getDataDir(getIdentifier()); }
+	/** @since 1.1.0 */
+	public Path getCacheDir(){ return dirs.getCacheDir(getIdentifier()); }
+	/** @since 1.1.0 */
+	public Path getTempDir(){ return dirs.getTempDir(getIdentifier()); }
+	/** @since 1.1.0 */
+	public Path getLogDir(){ return dirs.getLogDir(getIdentifier()); }
+	@Deprecated
+	public File getConfigDirFile(){ return getConfigDir().toFile(); }
+	@Deprecated
+	public File getDataDirFile(){ return getDataDir().toFile(); }
+	@Deprecated
+	public File getCacheDirFile(){ return getCacheDir().toFile(); }
+	@Deprecated
+	public File getTempDirFile(){ return getTempDir().toFile(); }
+	@Deprecated
+	public File getLogDirFile(){ return getLogDir().toFile(); }
 
 	// SETTERS
 	public void setLoggingLevel(final Level level){
@@ -125,8 +142,8 @@ public abstract class App<C extends Configuration>{
 		dirs = Directories.create(config);
 		Exception configException = null;
 
-		if(config.getFile() == null)
-			config.setFile(new File(getConfigDir(), DEFAULT_CONFIG_FILENAME));
+		if(config.getPath() == null)
+			config.setPath(getConfigDir().resolve(DEFAULT_CONFIG_FILENAME));
 
 		try{
 			config.load();
@@ -193,25 +210,25 @@ public abstract class App<C extends Configuration>{
 
 		if(configException == null){
 			getLogger().notice(getI18n().get("config.current",
-				getConfig().getFile().getAbsolutePath()
+				getConfig().getPath().toAbsolutePath()
 			));
 		}else if(configException instanceof FileNotFoundException){
 			if(configDefaultsException instanceof IOException)
 				getLogger().error(getI18n().get(
 					"config.error.default",
-					getConfig().getFile().getAbsoluteFile(),
+					getConfig().getPath().toAbsolutePath(),
 					configDefaultsException.getMessage()
 				));
 			else
 				getLogger().notice(getI18n().get(
 					"config.generated",
-					config.getFile().getAbsolutePath()
+					config.getPath().toAbsolutePath()
 				));
 
 			if(configReloadException != null){
 				getLogger().fatal(getI18n().get(
 					"config.error.reload",
-					getConfig().getFile().getAbsolutePath(),
+					getConfig().getPath().toAbsolutePath(),
 					configReloadException.getMessage()
 				));
 				throw new RuntimeException(configReloadException);
@@ -219,12 +236,11 @@ public abstract class App<C extends Configuration>{
 		}else{
 			getLogger().fatal(getI18n().get(
 				"config.error.load",
-				getConfig().getFile().getAbsolutePath(),
+				getConfig().getPath().toAbsolutePath(),
 				configException.getMessage()
 			));
 			throw new RuntimeException(configException);
 		}
-
 
 		if(!languageSupported)
 			getLogger().warn(getI18n().get("i18n.error.support",

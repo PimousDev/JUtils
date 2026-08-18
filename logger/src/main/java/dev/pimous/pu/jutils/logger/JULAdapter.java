@@ -14,6 +14,10 @@ public class JULAdapter implements Logger{
 	public JULAdapter(final java.util.logging.Logger logger){
 		this.logger = logger;
 	}
+	/** @since 1.1.0 */
+	public JULAdapter(final String name){
+		this.logger = java.util.logging.Logger.getLogger(name);
+	}
 
 	// GETTERS
 	@Override

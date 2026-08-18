@@ -3,6 +3,7 @@ package dev.pimous.pu.jutils.app.dirs;
 import dev.pimous.pu.jutils.config.Configuration;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * @author Xibitol
@@ -15,55 +16,115 @@ public class LocalDirs extends AbstractDirs{
 	}
 
 	// GETTERS
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalConfigDir(){
-		return new File(CONFIG_DIR);
+	public Path getGlobalConfigDir(){
+		return CONFIG_DIR;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getConfigDir(final String identifier){
-		File dir = getGlobalConfigDir();
+	public Path getConfigDir(final String identifier){
+		final var dir = getGlobalConfigDir();
 		if(shouldDirsBeMade()) makeDir(dir, dir);
 		return dir;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalDataDir(){
-		return new File(DATA_DIR);
+	public Path getGlobalDataDir(){
+		return DATA_DIR;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getDataDir(final String identifier){
-		File dir = getGlobalDataDir();
+	public Path getDataDir(final String identifier){
+		final var dir = getGlobalDataDir();
 		if(shouldDirsBeMade()) makeDir(dir, dir);
 		return dir;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalCacheDir(){
-		return new File(CACHE_DIR);
+	public Path getGlobalCacheDir(){
+		return CACHE_DIR;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getCacheDir(final String identifier){
-		File dir = getGlobalCacheDir();
+	public Path getCacheDir(final String identifier){
+		final var dir = getGlobalCacheDir();
 		if(shouldDirsBeMade()) makeDir(dir, dir);
 		return dir;
+	}
+	@Deprecated
+	@Override
+	public File getGlobalConfigDirFile(){
+		return getGlobalConfigDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getConfigDirFile(final String identifier){
+		return getConfigDir(identifier).toFile();
+	}
+	@Deprecated
+	@Override
+	public File getGlobalDataDirFile(){
+		return getGlobalDataDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getDataDirFile(final String identifier){
+		return getDataDir(identifier).toFile();
+	}
+	@Deprecated
+	@Override
+	public File getGlobalCacheDirFile(){
+		return getGlobalCacheDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getCacheDirFile(final String identifier){
+		return getCacheDir(identifier).toFile();
 	}
 
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalTempDir(){
-		return new File(TEMP_DIR);
+	public Path getGlobalTempDir(){
+		return TEMP_DIR;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getTempDir(final String identifier){
-		File dir = getGlobalTempDir();
+	public Path getTempDir(final String identifier){
+		final var dir = getGlobalTempDir();
 		if(shouldDirsBeMade()) makeDir(dir, dir);
 		return dir;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getGlobalLogDir(){
-		return new File(LOG_DIR);
+	public Path getGlobalLogDir(){
+		return LOG_DIR;
 	}
+	/** @since 1.1.0 */
 	@Override
-	public File getLogDir(final String identifier){
-		File dir = getGlobalLogDir();
+	public Path getLogDir(final String identifier){
+		final var dir = getGlobalLogDir();
 		if(shouldDirsBeMade()) makeDir(dir, dir);
 		return dir;
+	}
+	@Deprecated
+	@Override
+	public File getGlobalTempDirFile(){
+		return getGlobalTempDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getTempDirFile(final String identifier){
+		return getTempDir(identifier).toFile();
+	}
+	@Deprecated
+	@Override
+	public File getGlobalLogDirFile(){
+		return getGlobalLogDir().toFile();
+	}
+	@Deprecated
+	@Override
+	public File getLogDirFile(final String identifier){
+		return getLogDir(identifier).toFile();
 	}
 }
