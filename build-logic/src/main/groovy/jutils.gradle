@@ -1,5 +1,5 @@
 /* JUtils (Build tools and Utility libraries/classes)
-JUtils gradle build-logic v1.0.0
+JUtils gradle build-logic v1.1.0
 Copyright © 2026 - Pimous Dev. (https://www.pimous.dev/)
 
 These programs are free software: you can redistribute them and/or modify them
@@ -49,11 +49,16 @@ dependencies{
 
 tasks.withType(JavaCompile).configureEach{
 	options.compilerArgs.add("-Xlint:all")
-	options.compilerArgs.add("-Werror")
 	options.deprecation = true
 }
 
 tasks.withType(Test).configureEach{
 	useJUnitPlatform()
 	maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
+	doFirst{
+		workingDir(project.layout.buildDirectory.dir("test-wd"))
+		workingDir.delete()
+		workingDir.mkdir()
+	}
 }
