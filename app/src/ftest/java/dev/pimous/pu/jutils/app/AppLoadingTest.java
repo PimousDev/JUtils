@@ -8,10 +8,16 @@ import dev.pimous.pu.jutils.logger.Level;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.io.*;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
@@ -99,10 +105,8 @@ class AppLoadingTest{
 			false
 		));
 		assertTrue(Files.exists(CONFIG_PATH));
-		assertDoesNotThrow(
-			() -> Files.deleteIfExists(CONFIG_PATH)
-		);
 	}
+
 	@Test
 	void loadingSystem(){
 		assertFalse(Files.exists(CONFIG_PATH));
@@ -114,9 +118,6 @@ class AppLoadingTest{
 			true
 		));
 		assertTrue(Files.exists(app.getConfig().getPath()));
-		assertDoesNotThrow(
-			() -> Files.deleteIfExists(app.getConfig().getPath())
-		);
 
 		assertTrue(outCapture.size() > 0);
 		assertTrue(errCapture.size() > 0);
@@ -144,9 +145,6 @@ class AppLoadingTest{
 			true
 		));
 		assertTrue(Files.exists(app.getConfig().getPath()));
-		assertDoesNotThrow(
-			() -> Files.deleteIfExists(app.getConfig().getPath())
-		);
 
 		assertFalse(outCapture.toString().contains("INFO"));
 		assertFalse(errCapture.toString().contains("INFO"));
@@ -155,6 +153,29 @@ class AppLoadingTest{
 			app.getTimeZone().toZoneId()
 		);
 		assertTrue(app.isLoaded());
+	}
+	@Test
+	@EnabledOnOs(OS.LINUX)
+	void loadingInaccessibleConfig(){
+		final var perms = PosixFilePermissions.fromString("---------");
+
+		assertDoesNotThrow(() -> Files.createFile(CONFIG_PATH,
+			PosixFilePermissions.asFileAttribute(perms)
+		));
+
+		var t = assertThrowsExactly(RuntimeException.class, () -> app.load(
+			new UnsetConfig(CONFIG_PATH,
+				getProperties("system.properties"),
+				false
+			),
+			false
+		));
+		assertTrue(Files.exists(CONFIG_PATH));
+		assertInstanceOf(AccessDeniedException.class, t.getCause().getCause());
+
+		assertDoesNotThrow(() -> assertEquals(perms,
+			Files.getPosixFilePermissions(CONFIG_PATH, new LinkOption[]{})
+		));
 	}
 
 	// FUNCTIONS
