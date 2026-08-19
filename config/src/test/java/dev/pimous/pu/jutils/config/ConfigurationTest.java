@@ -58,6 +58,7 @@ class ConfigurationTest{
 		assertThrows(NoSuchElementException.class,
 			() -> config.getSection(DummyConfig.class)
 		);
+		assertEquals(2, config.getSectionCount());
 
 		assertThrows(IllegalArgumentException.class,
 			() -> config.get("host").orElseThrow()

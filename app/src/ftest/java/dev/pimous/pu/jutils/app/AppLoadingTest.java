@@ -28,9 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AppLoadingTest{
 
 	private static final Path CONFIG_PATH = Path.of("unwritten.properties");
-	private static final Path DEFAULT_CONFIG_PATH = Path.of(
-		App.DEFAULT_CONFIG_FILENAME
-	);
+
 	private static ByteArrayOutputStream outCapture;
 	private static ByteArrayOutputStream errCapture;
 	private static TestApp app;
@@ -48,25 +46,25 @@ class AppLoadingTest{
 	void clean(){
 		try{
 			Files.deleteIfExists(CONFIG_PATH);
+			Files.deleteIfExists(App.DEFAULT_CONFIG_FILENAME);
 		}catch(IOException ignored){}
 
-		if(Files.exists(CONFIG_PATH))
+		if(Files.exists(CONFIG_PATH)
+			|| Files.exists(App.DEFAULT_CONFIG_FILENAME)
+		)
 			throw new RuntimeException();
 	}
 
 	@Test
 	void loadingDefaults(){
 		assertDoesNotThrow(() -> app.load(
-			new LocalizedConfig(null,
+			new LocalizedConfig(CONFIG_PATH,
 				getProperties("system.properties"),
 				false
 			),
 			false
 		));
-		assertTrue(Files.exists(app.getConfig().getPath()));
-		assertDoesNotThrow(
-			() -> Files.deleteIfExists(app.getConfig().getPath())
-		);
+		assertFalse(Files.exists(app.getConfig().getPath()));
 
 		assertEquals(0, outCapture.size());
 		assertTrue(errCapture.size() > 0);
@@ -95,9 +93,20 @@ class AppLoadingTest{
 		));
 	}
 	@Test
-	void loadingDefaultsWithMandatoryUnset(){
+	void loadingDefaultsConfigFilename(){
+		assertThrowsExactly(RuntimeException.class, () -> app.load(
+			new UnsetConfig(null,
+				getProperties("system.properties"),
+				true
+			),
+			false
+		));
+		assertTrue(Files.exists(app.getConfig().getPath()));
 		assertFalse(Files.exists(CONFIG_PATH));
-		var t = assertThrowsExactly(RuntimeException.class, () -> app.load(
+	}
+	@Test
+	void loadingDefaultsWithMandatoryUnset(){
+		assertThrowsExactly(RuntimeException.class, () -> app.load(
 			new UnsetConfig(CONFIG_PATH,
 				getProperties("system.properties"),
 				false
@@ -109,7 +118,6 @@ class AppLoadingTest{
 
 	@Test
 	void loadingSystem(){
-		assertFalse(Files.exists(CONFIG_PATH));
 		assertDoesNotThrow(() -> app.load(
 			new LocalizedConfig(CONFIG_PATH,
 				getProperties("system.properties"),
@@ -192,7 +200,7 @@ class AppLoadingTest{
 	}
 
 	// INNER CLASSES
-	private static class TestApp extends App<LocalizedConfig>{
+	private static class TestApp extends App<Configuration>{
 
 		private static final I18n language = new I18n(Locale.FRENCH, List.of());
 
@@ -213,6 +221,7 @@ class AppLoadingTest{
 		@Override
 		public void run(Console console, String[] args){}
 	}
+
 	private static class LocalizedConfig extends Configuration{
 
 		public LocalizedConfig(final Path path,
@@ -229,6 +238,7 @@ class AppLoadingTest{
 				));
 		}
 	}
+
 	private static class UnsetConfig extends LocalizedConfig{
 
 		public UnsetConfig(final Path path,

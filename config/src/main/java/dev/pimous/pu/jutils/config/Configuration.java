@@ -43,6 +43,7 @@ public abstract class Configuration{
 	public File getFile(){ return path != null ? path.toFile() : null; }
 	/** @since 1.1.0 */
 	public Path getPath(){ return path; }
+
 	public <S extends ConfigSection> boolean hasSection(
 		final Class<S> sectionClass
 	){
@@ -55,6 +56,9 @@ public abstract class Configuration{
 			.map(sectionClass::cast)
 			.findFirst().orElseThrow();
 	}
+	/** @since 1.1.0 */
+	public int getSectionCount(){ return this.sections.size(); }
+
 	public Optional<Object> get(final String property){
 		final Matcher m = PROPERTY_PATTERN.matcher(property);
 		if(!m.matches())

@@ -32,7 +32,9 @@ import java.util.concurrent.ScheduledExecutorService;
 public abstract class App<C extends Configuration>{
 
 	private static final String APP_RESOURCE_FILENAME = "app.properties";
-	public static final String DEFAULT_CONFIG_FILENAME = "config.properties";
+	public static final Path DEFAULT_CONFIG_FILENAME = Path.of(
+		"config.properties"
+	);
 
 	private final AppConfig appConfig = new AppConfig();
 	public final InputStream in;
@@ -147,13 +149,19 @@ public abstract class App<C extends Configuration>{
 		if(config.getPath() == null)
 			config.setPath(getConfigDir().resolve(DEFAULT_CONFIG_FILENAME));
 
-		try{
-			config.load();
-		}catch(Exception e){
-			configException = e;
+		if(this.config.getSectionCount() > 0){
+			try{
+				config.load();
+			}catch(Exception e){
+				configException = e;
+			}
 		}
 
 		// I18n from defaults and system
+		// I18n is loaded before config reload because defaults have already
+		// been defined either in I18n or in LocalizationConfig; Reloading
+		// implies no new values, as defaults are written out to a new file and
+		// comes from system variables or otherwise, from the constructor.
 		this.language = language;
 		Locale locale = language.defaultLocale;
 		timeZone = TimeZone.getTimeZone(ZoneOffset.UTC);
@@ -174,7 +182,8 @@ public abstract class App<C extends Configuration>{
 		Throwable configDefaultsException = null;
 		Throwable configReloadException = null;
 
-		if(configException != null
+		if(this.config.getSectionCount() > 0
+			&& configException != null
 			&& configException.getCause() instanceof NoSuchFileException
 		){
 			try{
@@ -185,7 +194,7 @@ public abstract class App<C extends Configuration>{
 
 			try{
 				config.load(config.toProperties());
-			}catch(ConfigPropertyException | IllegalArgumentException e){
+			}catch(ConfigPropertyException|IllegalArgumentException e){
 				configReloadException = e;
 			}
 		}
@@ -212,11 +221,13 @@ public abstract class App<C extends Configuration>{
 				getI18n().get("log.error.open", getLogDir())
 			);
 
-		if(configException == null){
+		if(this.config.getSectionCount() == 0)
+			getLogger().info(getI18n().get("config.empty"));
+		else if(configException == null)
 			getLogger().notice(getI18n().get("config.current",
 				getConfig().getPath().toAbsolutePath()
 			));
-		}else if(configException.getCause() instanceof NoSuchFileException){
+		else if(configException.getCause() instanceof NoSuchFileException){
 			if(configDefaultsException != null)
 				getLogger().error(getI18n().get(
 					"config.error.default",
