@@ -46,8 +46,13 @@ public abstract class AbstractDirs implements Directories{
 	// SETTERS
 	/** @since 1.1.0 */
 	protected void makeDir(final Path parent, final Path full){
-		try{
-			Files.createDirectory(full);
+		try{ // TODO: To test
+			if(!parent.equals(full) && !Files.isDirectory(parent))
+				throw new IOException(
+					"%s isn't a directory or doesn't exist;".formatted(parent)
+				);
+
+			Files.createDirectories(full);
 		}catch(IOException e){
 			LOGGER.warn("Unable to create %s directory;".formatted(full), e);
 		}

@@ -68,6 +68,9 @@ class AppLoadingTest{
 
 		assertEquals(0, outCapture.size());
 		assertTrue(errCapture.size() > 0);
+		assertTrue(errCapture.toString().contains("NOTICE"));
+		assertFalse(errCapture.toString().contains("WARNING"));
+
 		assertEquals(Locale.FRENCH, app.getI18n().getLocale());
 		assertEquals(ZoneId.of("UTC"), app.getTimeZone().toZoneId());
 		assertTrue(app.isLoaded());
@@ -77,12 +80,6 @@ class AppLoadingTest{
 		assertEquals(Path.of("cache"), app.getCacheDir());
 		assertEquals(Path.of("tmp"), app.getTempDir());
 		assertEquals(Path.of("log"), app.getLogDir());
-		// TODO: All deprecated
-		assertEquals(new File("config"), app.getConfigDirFile());
-		assertEquals(new File("data"), app.getDataDirFile());
-		assertEquals(new File("cache"), app.getCacheDirFile());
-		assertEquals(new File("tmp"), app.getTempDirFile());
-		assertEquals(new File("log"), app.getLogDirFile());
 
 		assertThrowsExactly(RuntimeException.class, () -> app.load(
 			new LocalizedConfig(CONFIG_PATH,
@@ -91,6 +88,23 @@ class AppLoadingTest{
 			),
 			false
 		));
+	}
+	@SuppressWarnings("deprecation")
+	@Test
+	void loadingDefaultsDeprecation(){
+		assertDoesNotThrow(() -> app.load(
+			new LocalizedConfig(CONFIG_PATH,
+				getProperties("system.properties"),
+				false
+			),
+			false
+		));
+
+		assertEquals(new File("config"), app.getConfigDirFile());
+		assertEquals(new File("data"), app.getDataDirFile());
+		assertEquals(new File("cache"), app.getCacheDirFile());
+		assertEquals(new File("tmp"), app.getTempDirFile());
+		assertEquals(new File("log"), app.getLogDirFile());
 	}
 	@Test
 	void loadingDefaultsConfigFilename(){
@@ -128,7 +142,7 @@ class AppLoadingTest{
 		assertTrue(Files.exists(app.getConfig().getPath()));
 
 		assertTrue(outCapture.size() > 0);
-		assertTrue(errCapture.size() > 0);
+		assertEquals(0, errCapture.size());
 		assertEquals(Locale.of("de", "CH"), app.getI18n().getLocale());
 		assertEquals(ZoneId.of("CET"), app.getTimeZone().toZoneId());
 		assertTrue(app.isLoaded());

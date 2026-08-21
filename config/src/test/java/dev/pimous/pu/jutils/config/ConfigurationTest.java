@@ -43,11 +43,8 @@ class ConfigurationTest{
 		);
 
 		assertNull(config.getPath());
-		assertNull(config.getFile()); // TODO: Deprecated
 		config.setPath(PATH);
 		assertEquals(PATH, config.getPath());
-		config.setFile(PATH.toFile()); // TODO: Deprecated
-		assertEquals(PATH.toFile(), config.getFile()); // TODO: Deprecated
 
 		assertTrue(config.hasSection(ConfigSectionTest.TestConfig.class));
 		assertFalse(config.hasSection(DummyConfig.class));
@@ -79,14 +76,27 @@ class ConfigurationTest{
 
 		assertEquals("GillardeauOS", config.getSystem().getOSName());
 		assertEquals(Path.of("."), config.getSystem().getHome());
-		assertEquals(new File("."), config.getSystem().getHomeFile()); // TODO: Deprecated
 		assertEquals(Path.of("."), config.getSystem().getWorkingDir());
-		assertEquals(new File("."), config.getSystem().getWorkingDirFile()); // TODO: Deprecated
 
 		assertEquals(env.get("java.io.tmpdir"),
 			config.getEnv("java.io.tmpdir", "test")
 		);
 		assertEquals("test", config.getEnv("undefined", "test"));
+	}
+	// TODO: Deprecated
+	@SuppressWarnings("deprecation")
+	@Test
+	void gettersDeprecated(){
+		final ServerConfig config = new ServerConfig(
+			getProperties("config/system.properties"), env
+		);
+
+		assertNull(config.getFile());
+		config.setFile(PATH.toFile());
+		assertEquals(PATH.toFile(), config.getFile());
+
+		assertEquals(new File("."), config.getSystem().getHomeFile());
+		assertEquals(new File("."), config.getSystem().getWorkingDirFile());
 	}
 
 	@Test
