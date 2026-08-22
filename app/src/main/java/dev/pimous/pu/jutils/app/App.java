@@ -129,6 +129,9 @@ public abstract class App<C extends Configuration>{
 	}
 
 	// FUNCTIONS
+	/** @apiNote If you specify your own config path, the app default
+	 * configuration directory might not be created automatically.
+	 */
 	public void load(
 		final C config,
 		final I18n language,
@@ -147,7 +150,11 @@ public abstract class App<C extends Configuration>{
 		Throwable configException = null;
 
 		if(config.getPath() == null)
-			config.setPath(getConfigDir().resolve(DEFAULT_CONFIG_FILENAME));
+			config.setPath(
+				dirs.getConfigDir(
+					getIdentifier(), this.config.getSectionCount() > 0
+				).resolve(DEFAULT_CONFIG_FILENAME)
+			);
 
 		if(this.config.getSectionCount() > 0){
 			try{

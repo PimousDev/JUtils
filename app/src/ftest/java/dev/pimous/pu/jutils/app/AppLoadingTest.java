@@ -5,9 +5,7 @@ import dev.pimous.pu.jutils.config.Configuration;
 import dev.pimous.pu.jutils.config.LocalizationConfig;
 import dev.pimous.pu.jutils.i18n.I18n;
 import dev.pimous.pu.jutils.logger.Level;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
@@ -25,8 +23,13 @@ import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AppLoadingTest{
 
+	private static final Path CONFIG_DIR = Path.of("config");
+	private static final Path DEFAULT_CONFIG_PATH = CONFIG_DIR.resolve(
+		App.DEFAULT_CONFIG_FILENAME
+	);
 	private static final Path CONFIG_PATH = Path.of("unwritten.properties");
 
 	private static ByteArrayOutputStream outCapture;
@@ -46,25 +49,27 @@ class AppLoadingTest{
 	void clean(){
 		try{
 			Files.deleteIfExists(CONFIG_PATH);
-			Files.deleteIfExists(App.DEFAULT_CONFIG_FILENAME);
-		}catch(IOException ignored){}
+			Files.deleteIfExists(DEFAULT_CONFIG_PATH);
+			Files.deleteIfExists(CONFIG_DIR);
+		}catch(IOException ignored){
+			ignored.printStackTrace();
+		}
 
-		if(Files.exists(CONFIG_PATH)
-			|| Files.exists(App.DEFAULT_CONFIG_FILENAME)
-		)
+		if(Files.exists(CONFIG_PATH) || Files.exists(DEFAULT_CONFIG_PATH))
 			throw new RuntimeException();
 	}
 
 	@Test
-	void loadingDefaults(){
+	@Order(0)
+	void loadingEmptyConfig(){
 		assertDoesNotThrow(() -> app.load(
-			new LocalizedConfig(CONFIG_PATH,
+			new LocalizedConfig(null,
 				getProperties("system.properties"),
 				false
 			),
 			false
 		));
-		assertFalse(Files.exists(app.getConfig().getPath()));
+		assertFalse(Files.isDirectory(CONFIG_DIR));
 
 		assertEquals(0, outCapture.size());
 		assertTrue(errCapture.size() > 0);
@@ -91,7 +96,8 @@ class AppLoadingTest{
 	}
 	@SuppressWarnings("deprecation")
 	@Test
-	void loadingDefaultsDeprecation(){
+	@Order(1)
+	void loadingEmptyConfigDeprecation(){
 		assertDoesNotThrow(() -> app.load(
 			new LocalizedConfig(CONFIG_PATH,
 				getProperties("system.properties"),
@@ -99,6 +105,7 @@ class AppLoadingTest{
 			),
 			false
 		));
+		assertFalse(Files.isDirectory(CONFIG_DIR));
 
 		assertEquals(new File("config"), app.getConfigDirFile());
 		assertEquals(new File("data"), app.getDataDirFile());
@@ -107,18 +114,20 @@ class AppLoadingTest{
 		assertEquals(new File("log"), app.getLogDirFile());
 	}
 	@Test
+	@Order(2)
 	void loadingDefaultsConfigFilename(){
-		assertThrowsExactly(RuntimeException.class, () -> app.load(
-			new UnsetConfig(null,
+		assertDoesNotThrow(() -> app.load(
+			new LocalizedConfig(null,
 				getProperties("system.properties"),
 				true
 			),
 			false
 		));
-		assertTrue(Files.exists(app.getConfig().getPath()));
+		assertTrue(Files.exists(DEFAULT_CONFIG_PATH));
 		assertFalse(Files.exists(CONFIG_PATH));
 	}
 	@Test
+	@Order(3)
 	void loadingDefaultsWithMandatoryUnset(){
 		assertThrowsExactly(RuntimeException.class, () -> app.load(
 			new UnsetConfig(CONFIG_PATH,
@@ -131,6 +140,7 @@ class AppLoadingTest{
 	}
 
 	@Test
+	@Order(4)
 	void loadingSystem(){
 		assertDoesNotThrow(() -> app.load(
 			new LocalizedConfig(CONFIG_PATH,
@@ -139,7 +149,7 @@ class AppLoadingTest{
 			),
 			true
 		));
-		assertTrue(Files.exists(app.getConfig().getPath()));
+		assertTrue(Files.exists(CONFIG_PATH));
 
 		assertTrue(outCapture.size() > 0);
 		assertEquals(0, errCapture.size());
@@ -148,6 +158,7 @@ class AppLoadingTest{
 		assertTrue(app.isLoaded());
 	}
 	@Test
+	@Order(5)
 	void loadingConfig() throws IOException{
 		assertDoesNotThrow(() -> Files.createFile(CONFIG_PATH));
 		assertTrue(Files.exists(CONFIG_PATH));
@@ -166,7 +177,7 @@ class AppLoadingTest{
 			),
 			true
 		));
-		assertTrue(Files.exists(app.getConfig().getPath()));
+		assertTrue(Files.exists(CONFIG_PATH));
 
 		assertFalse(outCapture.toString().contains("INFO"));
 		assertFalse(errCapture.toString().contains("INFO"));
@@ -177,6 +188,7 @@ class AppLoadingTest{
 		assertTrue(app.isLoaded());
 	}
 	@Test
+	@Order(6)
 	@EnabledOnOs(OS.LINUX)
 	void loadingInaccessibleConfig(){
 		final var perms = PosixFilePermissions.fromString("---------");
