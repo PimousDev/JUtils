@@ -38,15 +38,41 @@ public abstract class AbstractDirs implements Directories{
 
 	// GETTERS
 	protected Configuration getConfig(){ return config; }
-	protected boolean shouldDirsBeMade(){ return !shouldDirsExist; }
+	private boolean shouldMakeDirs(){ return !shouldDirsExist; }
 	protected Path getHomeDir(){
 		return config.getSystem().getHome();
+	}
+
+	/** @since 1.1.0 */
+	@Override
+	public Path getConfigDir(final String identifier){
+		return getConfigDir(identifier, shouldMakeDirs());
+	}
+	/** @since 1.1.0 */
+	@Override
+	public Path getDataDir(final String identifier){
+		return getDataDir(identifier, shouldMakeDirs());
+	}
+	/** @since 1.1.0 */
+	@Override
+	public Path getCacheDir(final String identifier){
+		return getCacheDir(identifier, shouldMakeDirs());
+	}
+	/** @since 1.1.0 */
+	@Override
+	public Path getTempDir(final String identifier){
+		return getTempDir(identifier, shouldMakeDirs());
+	}
+	/** @since 1.1.0 */
+	@Override
+	public Path getLogDir(final String identifier){
+		return getLogDir(identifier, shouldMakeDirs());
 	}
 
 	// SETTERS
 	/** @since 1.1.0 */
 	protected void makeDir(final Path parent, final Path full){
-		try{ // TODO: To test
+		try{
 			if(!parent.equals(full) && !Files.isDirectory(parent))
 				throw new IOException(
 					"%s isn't a directory or doesn't exist;".formatted(parent)

@@ -19,44 +19,76 @@ public interface Directories{
 	/** @since 1.1.0 */
 	Path getGlobalConfigDir();
 	/** @since 1.1.0 */
-	Path getConfigDir(final String identifier);
-	/** @since 1.1.0 */
 	Path getGlobalDataDir();
-	/** @since 1.1.0 */
-	Path getDataDir(final String identifier);
 	/** @since 1.1.0 */
 	Path getGlobalCacheDir();
 	/** @since 1.1.0 */
-	Path getCacheDir(final String identifier);
+	Path getGlobalTempDir();
+	/** @since 1.1.0 */
+	Path getGlobalLogDir();
+
 	@Deprecated
-	File getGlobalConfigDirFile();
+	default File getGlobalConfigDirFile(){
+		return getGlobalConfigDir().toFile();
+	}
 	@Deprecated
-	File getConfigDirFile(final String identifier);
+	default File getGlobalDataDirFile(){
+		return getGlobalDataDir().toFile();
+	}
 	@Deprecated
-	File getGlobalDataDirFile();
+	default File getGlobalCacheDirFile(){
+		return getGlobalCacheDir().toFile();
+	}
 	@Deprecated
-	File getDataDirFile(final String identifier);
+	default File getGlobalTempDirFile(){
+		return getGlobalTempDir().toFile();
+	}
 	@Deprecated
-	File getGlobalCacheDirFile();
-	@Deprecated
-	File getCacheDirFile(final String identifier);
+	default File getGlobalLogDirFile(){
+		return getGlobalLogDir().toFile();
+	}
 
 	/** @since 1.1.0 */
-	Path getGlobalTempDir();
+	Path getConfigDir(final String identifier);
+	/** @since 1.1.0 */
+	Path getDataDir(final String identifier);
+	/** @since 1.1.0 */
+	Path getCacheDir(final String identifier);
 	/** @since 1.1.0 */
 	Path getTempDir(final String identifier);
 	/** @since 1.1.0 */
-	Path getGlobalLogDir();
-	/** @since 1.1.0 */
 	Path getLogDir(final String identifier);
+	/** @since 1.1.0 */
+	Path getConfigDir(final String identifier, final boolean shouldMakeDir);
+	/** @since 1.1.0 */
+	Path getDataDir(final String identifier, final boolean shouldMakeDir);
+	/** @since 1.1.0 */
+	Path getCacheDir(final String identifier, final boolean shouldMakeDir);
+	/** @since 1.1.0 */
+	Path getTempDir(final String identifier, final boolean shouldMakeDir);
+	/** @since 1.1.0 */
+	Path getLogDir(final String identifier, final boolean shouldMakeDir);
+
 	@Deprecated
-	File getGlobalTempDirFile();
+	default File getConfigDirFile(final String identifier){
+		return getConfigDir(identifier).toFile();
+	}
 	@Deprecated
-	File getTempDirFile(final String identifier);
+	default File getDataDirFile(final String identifier){
+		return getDataDir(identifier).toFile();
+	}
 	@Deprecated
-	File getGlobalLogDirFile();
+	default File getCacheDirFile(final String identifier){
+		return getCacheDir(identifier).toFile();
+	}
 	@Deprecated
-	File getLogDirFile(final String identifier);
+	default File getTempDirFile(final String identifier){
+		return getTempDir(identifier).toFile();
+	}
+	@Deprecated
+	default File getLogDirFile(final String identifier){
+		return getLogDir(identifier).toFile();
+	}
 
 	// FUNCTIONS
 	static Directories create(final Configuration config){
