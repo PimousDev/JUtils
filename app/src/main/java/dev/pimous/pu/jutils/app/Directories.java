@@ -2,6 +2,7 @@ package dev.pimous.pu.jutils.app;
 
 import dev.pimous.pu.jutils.app.dirs.LinuxDirs;
 import dev.pimous.pu.jutils.app.dirs.LocalDirs;
+import dev.pimous.pu.jutils.app.dirs.WindowsDirs;
 import dev.pimous.pu.jutils.config.Configuration;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 public interface Directories{
 
 	String OS_LINUX_NAME = "Linux".toLowerCase();
+	String OS_WINDOWS_NAME = "Windows".toLowerCase();
 
 	// GETTERS
 	/** @since 1.1.0 */
@@ -101,6 +103,8 @@ public interface Directories{
 
 		if(os.contains(OS_LINUX_NAME))
 			return new LinuxDirs(config, shouldDirsExists);
+		else if(os.contains(OS_WINDOWS_NAME))
+			return new WindowsDirs(config, shouldDirsExists);
 		else
 			return new LocalDirs(config, shouldDirsExists);
 	}

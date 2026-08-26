@@ -2,6 +2,10 @@ package dev.pimous.pu.jutils.base;
 
 import java.io.Serial;
 
+/**
+ * @author APG-Gillardeau
+ * @since 1.0.0
+ */
 public class NotImplementedException extends InternalException{
 
 	@Serial

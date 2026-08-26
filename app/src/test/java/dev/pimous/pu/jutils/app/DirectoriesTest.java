@@ -2,6 +2,7 @@ package dev.pimous.pu.jutils.app;
 
 import dev.pimous.pu.jutils.app.dirs.LinuxDirs;
 import dev.pimous.pu.jutils.app.dirs.LocalDirs;
+import dev.pimous.pu.jutils.app.dirs.WindowsDirs;
 import dev.pimous.pu.jutils.config.Configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,6 +126,80 @@ class DirectoriesTest{
 			dirs.getTempDirFile("afl")
 		);
 		assertEquals(new File("undefined/home/.local/share/afl/log"),
+			dirs.getLogDirFile("afl")
+		);
+	}
+
+	@Test
+	void gettersWindows(){
+		final var dirs = new WindowsDirs(
+			new DummyConfig(getProperties("system/winDirs.properties")),
+			false
+		);
+
+		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming"),
+			dirs.getGlobalConfigDir()
+		);
+		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming"),
+			dirs.getGlobalDataDir()
+		);
+		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming"),
+			dirs.getGlobalCacheDir()
+		);
+		assertEquals(Path.of("/c/Windows/Temp"), dirs.getGlobalTempDir());
+		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming"),
+			dirs.getGlobalLogDir()
+		);
+
+		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming/afl/config"),
+			dirs.getConfigDir("afl")
+		);
+		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming/afl/data"),
+			dirs.getDataDir("afl")
+		);
+		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming/afl/cache"),
+			dirs.getCacheDir("afl")
+		);
+		assertEquals(Path.of("/c/Windows/Temp/afl"), dirs.getTempDir("afl"));
+		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming/afl/log"),
+			dirs.getLogDir("afl")
+		);
+	}
+	@SuppressWarnings("deprecation")
+	@Test
+	void deprecatedGettersWindows(){
+		final var dirs = new WindowsDirs(
+			new DummyConfig(getProperties("system/winDirs.properties")),
+			false
+		);
+
+		assertEquals(new File("/c/Users/undefined/AppData/Roaming"),
+			dirs.getGlobalConfigDirFile()
+		);
+		assertEquals(new File("/c/Users/undefined/AppData/Roaming"),
+			dirs.getGlobalDataDirFile()
+		);
+		assertEquals(new File("/c/Users/undefined/AppData/Roaming"),
+			dirs.getGlobalCacheDirFile()
+		);
+		assertEquals(new File("/c/Windows/Temp"), dirs.getGlobalTempDirFile());
+		assertEquals(new File("/c/Users/undefined/AppData/Roaming"),
+			dirs.getGlobalLogDirFile()
+		);
+
+		assertEquals(new File("/c/Users/undefined/AppData/Roaming/afl/config"),
+			dirs.getConfigDirFile("afl")
+		);
+		assertEquals(new File("/c/Users/undefined/AppData/Roaming/afl/data"),
+			dirs.getDataDirFile("afl")
+		);
+		assertEquals(new File("/c/Users/undefined/AppData/Roaming/afl/cache"),
+			dirs.getCacheDirFile("afl")
+		);
+		assertEquals(new File("/c/Windows/Temp/afl"),
+			dirs.getTempDirFile("afl")
+		);
+		assertEquals(new File("/c/Users/undefined/AppData/Roaming/afl/log"),
 			dirs.getLogDirFile("afl")
 		);
 	}
