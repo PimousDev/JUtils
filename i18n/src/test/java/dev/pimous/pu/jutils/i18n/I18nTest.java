@@ -13,18 +13,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class I18nTest{
 
 	@Test
-	void constructor(){
+	void getters(){
 		assertDoesNotThrow(
 			() -> new I18n(Locale.ENGLISH, Collections.emptyList())
 		);
-		assertThrows(IllegalArgumentException.class,
-			() -> new I18n(Locale.CHINA, Collections.emptyList())
-		);
 	}
-
+	@SuppressWarnings("deprecation")
 	@Test
-	void getters(){
-		assertTrue(I18n.isLocaleSupported(Locale.ENGLISH));
+	void gettersDeprecated(){
+		assertTrue(I18n.isLocaleSupported(Locale.of("en", "FR", "Linux")));
 		assertFalse(I18n.isLocaleSupported(Locale.CHINA));
 	}
 
@@ -50,7 +47,7 @@ class I18nTest{
 		assertNull(
 			i18n.getBundle().getParent().getParent().getParent().getParent()
 		);
-		assertEquals("1", i18n.getBundle().get("a"));
+		assertEquals("#UNDEFINED#", i18n.getBundle().get("a"));
 		assertEquals("2", i18n.getBundle().get("b"));
 		assertEquals("3", i18n.getBundle().get("c"));
 		assertEquals("4", i18n.getBundle().get("d"));

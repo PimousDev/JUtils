@@ -8,37 +8,43 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
+ * @apiNote "base" section is reserved for JUtils app sentences.
+ *
  * @author APG-Gillardeau
  * @since 1.0.0
  */
 public class I18n{
 
 	public static final String PROPERTIES_DIR = "i18n";
-	private static final String GENERAL_SECTION_NAME = "general";
+	private static final String BASE_SECTION_NAME = "base";
 
 	public final Locale defaultLocale;
 	private final Collection<String> sections;
 	private I18nBundle bundle;
 
 	public I18n(final Locale defaultLocale, final Collection<String> sections){
-		if(!isLocaleSupported(defaultLocale))
-			throw new IllegalArgumentException(
-				"Default locale isn't supported (Got %s);".formatted(
-					defaultLocale
-				)
-			);
-
 		this.defaultLocale = defaultLocale;
-		this.sections = sections;
+		this.sections = new ArrayList<>();
+		this.sections.addAll(sections);
 	}
 
 	// GETTERS
+	@Deprecated
 	public static boolean isLocaleSupported(final Locale locale){
+		return isLocaleSupported(locale, "general");
+	}
+	private static boolean isLocaleSupported(final Locale locale,
+		String section
+	){
 		return ClassLoader.getSystemResource(
-			LocaleResPaths.getLocaleResourcePath(locale, GENERAL_SECTION_NAME)
+			LocaleResPaths.getLocaleResourcePath(locale, "general")
 		) != null;
 	}
 
+	/** If the desired locale is de-CH-Linux and default locale is en-GB,
+	 * candidates locales will be from most to least significant: de-CH-Linux,
+	 * de-CH, de-Linux, de, en-GB-Linux and en-GB.
+	 */
 	private SequencedCollection<Locale> getCandidateLocales(
 		final Locale locale
 	){
@@ -63,9 +69,6 @@ public class I18n{
 			}
 		}
 
-		locales.removeIf(
-			l -> !l.equals(defaultLocale) && !isLocaleSupported(l)
-		);
 		return locales;
 	}
 	public I18nBundle getBundle(){ return bundle; }
@@ -101,12 +104,8 @@ public class I18n{
 		final boolean strictCheck
 	) throws BadResourceException{
 		final I18nConcreteBundle b = new I18nConcreteBundle(locale);
-
-		if(!loadBundleSection(b, GENERAL_SECTION_NAME, charset, strictCheck))
-			return null;
-
+		loadBundleSection(b, BASE_SECTION_NAME, charset, strictCheck);
 		sections.forEach(s -> loadBundleSection(b, s, charset, strictCheck));
-
 		return b;
 	}
 	private boolean loadBundleSection(final I18nConcreteBundle bundle,
@@ -120,7 +119,6 @@ public class I18n{
 			if(strictCheck) throw e;
 			return false;
 		}
-
 		return true;
 	}
 }
