@@ -14,98 +14,89 @@ import java.nio.file.Path;
  */
 public interface Directories{
 
-	String OS_LINUX_NAME = "Linux".toLowerCase();
-	String OS_WINDOWS_NAME = "Windows".toLowerCase();
+	final String OS_LINUX_NAME = "Linux".toLowerCase();
+	final String OS_WINDOWS_NAME = "Windows".toLowerCase();
 
 	// GETTERS
 	/** @since 1.1.0 */
-	Path getGlobalConfigDir();
+	Path getBinaryDir();
 	/** @since 1.1.0 */
-	Path getGlobalDataDir();
+	Path getLibraryDir();
 	/** @since 1.1.0 */
-	Path getGlobalCacheDir();
+	Path getConfigDir();
 	/** @since 1.1.0 */
-	Path getGlobalTempDir();
+	Path getDataDir();
 	/** @since 1.1.0 */
-	Path getGlobalLogDir();
+	Path getStateDir();
+	/** @since 1.1.0 */
+	Path getLogDir();
+	/** @since 1.1.0 */
+	Path getPersistentTemporaryDir();
+	/** @since 1.1.0 */
+	Path getCacheDir();
+	/** @since 1.1.0 */
+	Path getTemporaryDir();
 
-	@Deprecated
-	default File getGlobalConfigDirFile(){
-		return getGlobalConfigDir().toFile();
-	}
-	@Deprecated
-	default File getGlobalDataDirFile(){
-		return getGlobalDataDir().toFile();
-	}
-	@Deprecated
-	default File getGlobalCacheDirFile(){
-		return getGlobalCacheDir().toFile();
-	}
-	@Deprecated
-	default File getGlobalTempDirFile(){
-		return getGlobalTempDir().toFile();
-	}
-	@Deprecated
-	default File getGlobalLogDirFile(){
-		return getGlobalLogDir().toFile();
-	}
+	// Aliases
+	/** @since 1.1.0 */
+	default Path getBinDir(){ return getBinaryDir(); }
+	/** @since 1.1.0 */
+	default Path getLibDir(){ return getLibraryDir(); }
+	/** @since 1.1.0 */
+	default Path getPTempDir(){ return getPersistentTemporaryDir(); }
+	/** @since 1.1.0 */
+	default Path getPersistentTempDir(){ return getPersistentTemporaryDir(); }
+	/** @since 1.1.0 */
+	default Path getTempDir(){ return getTemporaryDir(); }
 
-	/** @since 1.1.0 */
-	Path getConfigDir(final String identifier);
-	/** @since 1.1.0 */
-	Path getDataDir(final String identifier);
-	/** @since 1.1.0 */
-	Path getCacheDir(final String identifier);
-	/** @since 1.1.0 */
-	Path getTempDir(final String identifier);
-	/** @since 1.1.0 */
-	Path getLogDir(final String identifier);
-	/** @since 1.1.0 */
-	Path getConfigDir(final String identifier, final boolean shouldMakeDir);
-	/** @since 1.1.0 */
-	Path getDataDir(final String identifier, final boolean shouldMakeDir);
-	/** @since 1.1.0 */
-	Path getCacheDir(final String identifier, final boolean shouldMakeDir);
-	/** @since 1.1.0 */
-	Path getTempDir(final String identifier, final boolean shouldMakeDir);
-	/** @since 1.1.0 */
-	Path getLogDir(final String identifier, final boolean shouldMakeDir);
-
+	// Deprecated File based methods.
+	@Deprecated
+	default File getGlobalConfigDirFile(){ return getConfigDir().toFile(); }
+	@Deprecated
+	default File getGlobalDataDirFile(){ return getDataDir().toFile(); }
+	@Deprecated
+	default File getGlobalCacheDirFile(){ return getCacheDir().toFile(); }
+	@Deprecated
+	default File getGlobalTempDirFile(){ return getTempDir().toFile(); }
+	@Deprecated
+	default File getGlobalLogDirFile(){ return getLogDir().toFile(); }
 	@Deprecated
 	default File getConfigDirFile(final String identifier){
-		return getConfigDir(identifier).toFile();
+		return getConfigDir().toFile();
 	}
 	@Deprecated
 	default File getDataDirFile(final String identifier){
-		return getDataDir(identifier).toFile();
+		return getDataDir().toFile();
 	}
 	@Deprecated
 	default File getCacheDirFile(final String identifier){
-		return getCacheDir(identifier).toFile();
+		return getCacheDir().toFile();
 	}
 	@Deprecated
 	default File getTempDirFile(final String identifier){
-		return getTempDir(identifier).toFile();
+		return getTempDir().toFile();
 	}
 	@Deprecated
 	default File getLogDirFile(final String identifier){
-		return getLogDir(identifier).toFile();
+		return getLogDir().toFile();
 	}
 
 	// FUNCTIONS
-	static Directories create(final Configuration config){
-		return create(config, false);
-	}
-	static Directories create(final Configuration config,
-		final boolean shouldDirsExists
+	/** @since 1.1.0 */
+	static Directories create(final App<?> context,
+		final boolean isSystem
 	){
-		String os = config.getSystem().getOSName().toLowerCase();
+		String os = context.getConfig().getSystem().getOSName().toLowerCase();
 
 		if(os.contains(OS_LINUX_NAME))
-			return new LinuxDirs(config, shouldDirsExists);
+			return new LinuxDirs(context, isSystem);
 		else if(os.contains(OS_WINDOWS_NAME))
-			return new WindowsDirs(config, shouldDirsExists);
+			return new WindowsDirs(context, isSystem);
 		else
-			return new LocalDirs(config, shouldDirsExists);
+			return createLocal(context);
+	}
+	/** @since 1.1.0 */
+	static Directories createLocal(final App<?> context){
+		return new LocalDirs(context);
 	}
 }

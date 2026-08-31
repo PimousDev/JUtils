@@ -3,7 +3,9 @@ package dev.pimous.pu.jutils.app;
 import dev.pimous.pu.jutils.app.dirs.LinuxDirs;
 import dev.pimous.pu.jutils.app.dirs.LocalDirs;
 import dev.pimous.pu.jutils.app.dirs.WindowsDirs;
+import dev.pimous.pu.jutils.config.ConfigPropertyException;
 import dev.pimous.pu.jutils.config.Configuration;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,195 +19,222 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DirectoriesTest{
 
+	private static final AppConfig PROPERTIES = new AppConfig();
+
+	@BeforeAll
+	static void loadProperties() throws ConfigPropertyException{
+		PROPERTIES.load(getProperties("app.properties"));
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	void deprecatedGetters(){
+		final var dirs = new LocalDirs(
+			PROPERTIES,
+			new DummyConfig(getProperties("system/dirs.properties"))
+		);
+
+		assertEquals(dirs.getConfigDir().toFile(),
+			dirs.getGlobalConfigDirFile()
+		);
+		assertEquals(dirs.getDataDir().toFile(),
+			dirs.getGlobalDataDirFile()
+		);
+		assertEquals(dirs.getCacheDir().toFile(),
+			dirs.getGlobalCacheDirFile()
+		);
+		assertEquals(dirs.getTemporaryDir().toFile(),
+			dirs.getGlobalTempDirFile()
+		);
+		assertEquals(dirs.getLogDir().toFile(),
+			dirs.getGlobalLogDirFile()
+		);
+
+		assertEquals(dirs.getConfigDir().toFile(),
+			dirs.getConfigDirFile("afl")
+		);
+		assertEquals(dirs.getDataDir().toFile(),
+			dirs.getDataDirFile("afl")
+		);
+		assertEquals(dirs.getCacheDir().toFile(),
+			dirs.getCacheDirFile("afl")
+		);
+		assertEquals(dirs.getTempDir().toFile(),
+			dirs.getTempDirFile("afl")
+		);
+		assertEquals(dirs.getLogDir().toFile(),
+			dirs.getLogDirFile("afl")
+		);
+	}
+
 	@Test
 	void gettersLocal(){
 		final var dirs = new LocalDirs(
-			new DummyConfig(getProperties("system/dirs.properties")),
-			false
+			PROPERTIES,
+			new DummyConfig(getProperties("system/dirs.properties"))
 		);
 
-		assertEquals(Path.of("config"), dirs.getGlobalConfigDir());
-		assertEquals(Path.of("data"), dirs.getGlobalDataDir());
-		assertEquals(Path.of("cache"), dirs.getGlobalCacheDir());
-		assertEquals(Path.of("tmp"), dirs.getGlobalTempDir());
-		assertEquals(Path.of("log"), dirs.getGlobalLogDir());
-
-		assertEquals(Path.of("config"), dirs.getConfigDir("afl"));
-		assertEquals(Path.of("data"), dirs.getDataDir("afl"));
-		assertEquals(Path.of("cache"), dirs.getCacheDir("afl"));
-		assertEquals(Path.of("tmp"), dirs.getTempDir("afl"));
-		assertEquals(Path.of("log"), dirs.getLogDir("afl"));
-	}
-	@SuppressWarnings("deprecation")
-	@Test
-	void deprecatedGettersLocal(){
-		final var dirs = new LocalDirs(
-			new DummyConfig(getProperties("system/dirs.properties")),
-			false
+		assertEquals(Path.of(".", "bin"), dirs.getBinaryDir());
+		assertEquals(Path.of(".", "lib"), dirs.getLibraryDir());
+		assertEquals(Path.of(".", "etc"), dirs.getConfigDir());
+		assertEquals(Path.of(".", "data"), dirs.getDataDir());
+		assertEquals(Path.of(".", "state"), dirs.getStateDir());
+		assertEquals(Path.of(".", "state", "log"), dirs.getLogDir());
+		assertEquals(Path.of(".", "state", "ptmp"),
+			dirs.getPersistentTemporaryDir()
 		);
-		assertEquals(new File("config"), dirs.getGlobalConfigDirFile());
-		assertEquals(new File("data"), dirs.getGlobalDataDirFile());
-		assertEquals(new File("cache"), dirs.getGlobalCacheDirFile());
-		assertEquals(new File("tmp"), dirs.getGlobalTempDirFile());
-		assertEquals(new File("log"), dirs.getGlobalLogDirFile());
-
-		assertEquals(new File("config"), dirs.getConfigDirFile("afl"));
-		assertEquals(new File("data"), dirs.getDataDirFile("afl"));
-		assertEquals(new File("cache"), dirs.getCacheDirFile("afl"));
-		assertEquals(new File("tmp"), dirs.getTempDirFile("afl"));
-		assertEquals(new File("log"), dirs.getLogDirFile("afl"));
+		assertEquals(Path.of(".", "cache"), dirs.getCacheDir());
+		assertEquals(Path.of(".", "tmp"), dirs.getTempDir());
 	}
-
 	@Test
 	void gettersLinux(){
-		final var dirs = new LinuxDirs(
+		final var sDirs = new LinuxDirs(
+			PROPERTIES,
+			new DummyConfig(getProperties("system/linuxDirs.properties")),
+			true
+		);
+
+		assertEquals(Path.of("/usr/local/bin"), sDirs.getBinaryDir());
+		assertEquals(Path.of("/usr/local/lib/pimous.dev/testApp"),
+			sDirs.getLibraryDir()
+		);
+		assertEquals(Path.of("/usr/local/etc/pimous.dev/testApp"),
+			sDirs.getConfigDir()
+		);
+		assertEquals(Path.of("/usr/local/share/pimous.dev/testApp"),
+			sDirs.getDataDir()
+		);
+		assertEquals(Path.of("/var/local/pimous.dev/testApp/state"),
+			sDirs.getStateDir()
+		);
+		assertEquals(Path.of("/var/local/pimous.dev/testApp/state/log"),
+			sDirs.getLogDir()
+		);
+		assertEquals(Path.of("/var/local/pimous.dev/testApp/state/ptmp"),
+			sDirs.getPersistentTemporaryDir()
+		);
+		assertEquals(Path.of("/var/local/pimous.dev/testApp/cache"),
+			sDirs.getCacheDir()
+		);
+		assertEquals(Path.of("undefined/tmp/pimous.dev/testApp"),
+			sDirs.getTempDir()
+		);
+
+		final var uDirs = new LinuxDirs(
+			PROPERTIES,
 			new DummyConfig(getProperties("system/linuxDirs.properties")),
 			false
 		);
+		final var home = Path.of("undefined", "home");
 
-		assertEquals(Path.of("undefined/home/.config"),
-			dirs.getGlobalConfigDir()
+		assertEquals(home.resolve(".local/bin"),
+			uDirs.getBinaryDir()
 		);
-		assertEquals(Path.of("undefined/home/.local/share"),
-			dirs.getGlobalDataDir()
+		assertEquals(home.resolve(".local/lib/pimous.dev/testApp"),
+			uDirs.getLibraryDir()
 		);
-		assertEquals(Path.of("undefined/home/.cache"),
-			dirs.getGlobalCacheDir()
+		assertEquals(home.resolve(".config/pimous.dev/testApp"),
+			uDirs.getConfigDir()
 		);
-		assertEquals(Path.of("undefined/tmp"), dirs.getGlobalTempDir());
-		assertEquals(Path.of("undefined/home/.local/share"),
-			dirs.getGlobalLogDir()
+		assertEquals(home.resolve(".local/share/pimous.dev/testApp"),
+			uDirs.getDataDir()
 		);
-
-		assertEquals(Path.of("undefined/home/.config/afl"),
-			dirs.getConfigDir("afl")
+		assertEquals(home.resolve(".local/state/pimous.dev/testApp"),
+			uDirs.getStateDir()
 		);
-		assertEquals(Path.of("undefined/home/.local/share/afl/data"),
-			dirs.getDataDir("afl")
+		assertEquals(home.resolve(".local/state/pimous.dev/testApp/log"),
+			uDirs.getLogDir()
 		);
-		assertEquals(Path.of("undefined/home/.cache/afl"),
-			dirs.getCacheDir("afl")
+		assertEquals(home.resolve(".local/state/pimous.dev/testApp/ptmp"),
+			uDirs.getPersistentTemporaryDir()
 		);
-		assertEquals(Path.of("undefined/tmp/afl"), dirs.getTempDir("afl"));
-		assertEquals(Path.of("undefined/home/.local/share/afl/log"),
-			dirs.getLogDir("afl")
+		assertEquals(home.resolve(".cache/pimous.dev/testApp"),
+			uDirs.getCacheDir()
+		);
+		assertEquals(Path.of("undefined/tmp/pimous.dev/testApp"),
+			uDirs.getTempDir()
 		);
 	}
-	@SuppressWarnings("deprecation")
-	@Test
-	void deprecatedGettersLinux(){
-		final var dirs = new LinuxDirs(
-			new DummyConfig(getProperties("system/linuxDirs.properties")),
-			false
-		);
-
-		assertEquals(new File("undefined/home/.config"),
-			dirs.getGlobalConfigDirFile()
-		);
-		assertEquals(new File("undefined/home/.local/share"),
-			dirs.getGlobalDataDirFile()
-		);
-		assertEquals(new File("undefined/home/.cache"),
-			dirs.getGlobalCacheDirFile()
-		);
-		assertEquals(new File("undefined/tmp"), dirs.getGlobalTempDirFile());
-		assertEquals(new File("undefined/home/.local/share"),
-			dirs.getGlobalLogDirFile()
-		);
-
-		assertEquals(new File("undefined/home/.config/afl"),
-			dirs.getConfigDirFile("afl")
-		);
-		assertEquals(new File("undefined/home/.local/share/afl/data"),
-			dirs.getDataDirFile("afl")
-		);
-		assertEquals(new File("undefined/home/.cache/afl"),
-			dirs.getCacheDirFile("afl")
-		);
-		assertEquals(new File("undefined/tmp/afl"),
-			dirs.getTempDirFile("afl")
-		);
-		assertEquals(new File("undefined/home/.local/share/afl/log"),
-			dirs.getLogDirFile("afl")
-		);
-	}
-
 	@Test
 	void gettersWindows(){
-		final var dirs = new WindowsDirs(
+		final var sDirs = new WindowsDirs(
+			PROPERTIES,
+			new DummyConfig(getProperties("system/winDirs.properties")),
+			true
+		);
+		final var programFiles = Path.of("/", "Program Files");
+		final var programData = Path.of("/", "ProgramData");
+
+		assertEquals(programFiles.resolve("pimous.dev", "testApp", "bin"),
+			sDirs.getBinaryDir()
+		);
+		assertEquals(programFiles.resolve("pimous.dev", "testApp", "lib"),
+			sDirs.getLibraryDir()
+		);
+		assertEquals(programData.resolve("pimous.dev", "testApp", "etc"),
+			sDirs.getConfigDir()
+		);
+		assertEquals(programData.resolve("pimous.dev", "testApp", "data"),
+			sDirs.getDataDir()
+		);
+		assertEquals(programData.resolve("pimous.dev", "testApp", "state"),
+			sDirs.getStateDir()
+		);
+		assertEquals(
+			programData.resolve("pimous.dev", "testApp", "state", "log"),
+			sDirs.getLogDir()
+		);
+		assertEquals(
+			programData.resolve("pimous.dev", "testApp", "state", "ptmp"),
+			sDirs.getPersistentTemporaryDir()
+		);
+		assertEquals(programData.resolve("pimous.dev", "testApp", "cache"),
+			sDirs.getCacheDir()
+		);
+		assertEquals(Path.of("/", "Windows", "Temp", "pimous.dev", "testApp"),
+			sDirs.getTempDir()
+		);
+
+		final var uDirs = new WindowsDirs(
+			PROPERTIES,
 			new DummyConfig(getProperties("system/winDirs.properties")),
 			false
 		);
+		final var home = Path.of("/", "Users", "undefined");
+		final var roaming = home.resolve("AppData", "Roaming");
+		final var local = home.resolve("AppData", "Local");
 
-		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming"),
-			dirs.getGlobalConfigDir()
+		assertEquals(roaming.resolve("pimous.dev", "testApp", "bin"),
+			uDirs.getBinaryDir()
 		);
-		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming"),
-			dirs.getGlobalDataDir()
+		assertEquals(roaming.resolve("pimous.dev", "testApp", "lib"),
+			uDirs.getLibraryDir()
 		);
-		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming"),
-			dirs.getGlobalCacheDir()
+		assertEquals(roaming.resolve("pimous.dev", "testApp", "etc"),
+			uDirs.getConfigDir()
 		);
-		assertEquals(Path.of("/c/Windows/Temp"), dirs.getGlobalTempDir());
-		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming"),
-			dirs.getGlobalLogDir()
+		assertEquals(roaming.resolve("pimous.dev", "testApp", "data"),
+			uDirs.getDataDir()
 		);
-
-		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming/afl/config"),
-			dirs.getConfigDir("afl")
+		assertEquals(local.resolve("pimous.dev", "testApp", "state"),
+			uDirs.getStateDir()
 		);
-		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming/afl/data"),
-			dirs.getDataDir("afl")
+		assertEquals(local.resolve("pimous.dev", "testApp", "state", "log"),
+			uDirs.getLogDir()
 		);
-		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming/afl/cache"),
-			dirs.getCacheDir("afl")
+		assertEquals(local.resolve("pimous.dev", "testApp", "state", "ptmp"),
+			uDirs.getPersistentTemporaryDir()
 		);
-		assertEquals(Path.of("/c/Windows/Temp/afl"), dirs.getTempDir("afl"));
-		assertEquals(Path.of("/c/Users/undefined/AppData/Roaming/afl/log"),
-			dirs.getLogDir("afl")
+		assertEquals(local.resolve("pimous.dev", "testApp", "cache"),
+			uDirs.getCacheDir()
 		);
-	}
-	@SuppressWarnings("deprecation")
-	@Test
-	void deprecatedGettersWindows(){
-		final var dirs = new WindowsDirs(
-			new DummyConfig(getProperties("system/winDirs.properties")),
-			false
-		);
-
-		assertEquals(new File("/c/Users/undefined/AppData/Roaming"),
-			dirs.getGlobalConfigDirFile()
-		);
-		assertEquals(new File("/c/Users/undefined/AppData/Roaming"),
-			dirs.getGlobalDataDirFile()
-		);
-		assertEquals(new File("/c/Users/undefined/AppData/Roaming"),
-			dirs.getGlobalCacheDirFile()
-		);
-		assertEquals(new File("/c/Windows/Temp"), dirs.getGlobalTempDirFile());
-		assertEquals(new File("/c/Users/undefined/AppData/Roaming"),
-			dirs.getGlobalLogDirFile()
-		);
-
-		assertEquals(new File("/c/Users/undefined/AppData/Roaming/afl/config"),
-			dirs.getConfigDirFile("afl")
-		);
-		assertEquals(new File("/c/Users/undefined/AppData/Roaming/afl/data"),
-			dirs.getDataDirFile("afl")
-		);
-		assertEquals(new File("/c/Users/undefined/AppData/Roaming/afl/cache"),
-			dirs.getCacheDirFile("afl")
-		);
-		assertEquals(new File("/c/Windows/Temp/afl"),
-			dirs.getTempDirFile("afl")
-		);
-		assertEquals(new File("/c/Users/undefined/AppData/Roaming/afl/log"),
-			dirs.getLogDirFile("afl")
+		assertEquals(local.resolve("Temp", "pimous.dev", "testApp"),
+			uDirs.getTempDir()
 		);
 	}
 
 	// FUNCTIONS
-	private Properties getProperties(final String resource){
+	private static Properties getProperties(final String resource){
 		final Properties props = new Properties();
 
 		try(final InputStream is = ClassLoader.getSystemResourceAsStream(

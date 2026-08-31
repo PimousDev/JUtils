@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AppLoadingTest{
 
-	private static final Path CONFIG_DIR = Path.of("config");
+	private static final Path CONFIG_DIR = Path.of("etc");
 	private static final Path DEFAULT_CONFIG_PATH = CONFIG_DIR.resolve(
 		App.DEFAULT_CONFIG_FILENAME
 	);
@@ -80,12 +80,6 @@ class AppLoadingTest{
 		assertEquals(ZoneId.of("UTC"), app.getTimeZone().toZoneId());
 		assertTrue(app.isLoaded());
 
-		assertEquals(Path.of("config"), app.getConfigDir());
-		assertEquals(Path.of("data"), app.getDataDir());
-		assertEquals(Path.of("cache"), app.getCacheDir());
-		assertEquals(Path.of("tmp"), app.getTempDir());
-		assertEquals(Path.of("log"), app.getLogDir());
-
 		assertThrowsExactly(RuntimeException.class, () -> app.load(
 			new LocalizedConfig(CONFIG_PATH,
 				getProperties("system.properties"),
@@ -107,11 +101,11 @@ class AppLoadingTest{
 		));
 		assertFalse(Files.isDirectory(CONFIG_DIR));
 
-		assertEquals(new File("config"), app.getConfigDirFile());
-		assertEquals(new File("data"), app.getDataDirFile());
-		assertEquals(new File("cache"), app.getCacheDirFile());
-		assertEquals(new File("tmp"), app.getTempDirFile());
-		assertEquals(new File("log"), app.getLogDirFile());
+		assertEquals(new File("./etc"), app.getConfigDirFile());
+		assertEquals(new File("./data"), app.getDataDirFile());
+		assertEquals(new File("./cache"), app.getCacheDirFile());
+		assertEquals(new File("./tmp"), app.getTempDirFile());
+		assertEquals(new File("./state/log"), app.getLogDirFile());
 	}
 	@Test
 	@Order(2)

@@ -1,90 +1,94 @@
 package dev.pimous.pu.jutils.app.dirs;
 
+import dev.pimous.pu.jutils.app.App;
+import dev.pimous.pu.jutils.app.AppConfig;
+import dev.pimous.pu.jutils.base.NotImplementedException;
 import dev.pimous.pu.jutils.config.Configuration;
 
 import java.io.File;
 import java.nio.file.Path;
 
-/**
+/** For "testApp" under group "pimous.dev", files will be:
+ * <ul>
+ *     <li>Binary: ./bin/</li>
+ *     <li>Library: ./lib/</li>
+ *     <li>Config: ./etc/</li>
+ *     <li>Data: ./data/</li>
+ *     <li>State: ./state/<ul>
+ *         <li>Log: ./log/</li>
+ *         <li>Persistent Temporary: ./ptmp/</li>
+ *     </ul></li>
+ *     <li>Cache: ./cache/</li>
+ *     <li>Temporary: ./tmp/</li>
+ * </ul>
  * @author Xibitol
  * @since 1.0.0
  */
 public class LocalDirs extends AbstractDirs{
 
-	public LocalDirs(final Configuration config, final boolean shouldDirsExist){
-		super(config, shouldDirsExist);
+	/** @since 1.1.0 */
+	public LocalDirs(final AppConfig properties, final Configuration config){
+		super(properties, config, false);
+	}
+	/** @since 1.1.0 */
+	public LocalDirs(final App<?> context){
+		super(context, false);
 	}
 
 	// GETTERS
-	/** @since 1.1.0 */
+	/** Folder is an assumption.
+	 * @since 1.1.0
+	 */
 	@Override
-	public Path getGlobalConfigDir(){
-		return CONFIG_DIR;
+	public Path getBinaryDir(){
+		return config.getSystem().getWorkingDir().resolve(BINARY_DIR);
+	}
+	/** Folder is an assumption.
+	 * @since 1.1.0
+	 */
+	@Override
+	public Path getLibraryDir(){
+		return config.getSystem().getWorkingDir().resolve(LIBRARY_DIR);
 	}
 	/** @since 1.1.0 */
 	@Override
-	public Path getGlobalDataDir(){
-		return DATA_DIR;
+	public Path getConfigDir(){
+		return composeDir(config.getSystem().getWorkingDir(), CONFIG_DIR);
 	}
 	/** @since 1.1.0 */
 	@Override
-	public Path getGlobalCacheDir(){
-		return CACHE_DIR;
+	public Path getDataDir(){
+		return composeDir(config.getSystem().getWorkingDir(), DATA_DIR);
 	}
 	/** @since 1.1.0 */
 	@Override
-	public Path getGlobalTempDir(){
-		return TEMP_DIR;
+	public Path getStateDir(){
+		return composeDir(config.getSystem().getWorkingDir(), STATE_DIR);
 	}
 	/** @since 1.1.0 */
 	@Override
-	public Path getGlobalLogDir(){
-		return LOG_DIR;
-	}
-
-	/** @since 1.1.0 */
-	@Override
-	public Path getConfigDir(final String identifier,
-		final boolean shouldMakeDir
-	){
-		final var dir = getGlobalConfigDir();
-		if(shouldMakeDir) makeDir(dir, dir);
-		return dir;
+	public Path getLogDir(){
+		return composeDir(
+			config.getSystem().getWorkingDir(),
+			STATE_DIR.resolve(LOG_DIR)
+		);
 	}
 	/** @since 1.1.0 */
 	@Override
-	public Path getDataDir(final String identifier,
-		final boolean shouldMakeDir
-	){
-		final var dir = getGlobalDataDir();
-		if(shouldMakeDir) makeDir(dir, dir);
-		return dir;
+	public Path getPersistentTemporaryDir(){
+		return composeDir(
+			config.getSystem().getWorkingDir(),
+			STATE_DIR.resolve(PERSISTENT_TEMPORARY_DIR)
+		);
 	}
 	/** @since 1.1.0 */
 	@Override
-	public Path getCacheDir(final String identifier,
-		final boolean shouldMakeDir
-	){
-		final var dir = getGlobalCacheDir();
-		if(shouldMakeDir) makeDir(dir, dir);
-		return dir;
+	public Path getCacheDir(){
+		return composeDir(config.getSystem().getWorkingDir(), CACHE_DIR);
 	}
 	/** @since 1.1.0 */
 	@Override
-	public Path getTempDir(final String identifier,
-		final boolean shouldMakeDir
-	){
-		final var dir = getGlobalTempDir();
-		if(shouldMakeDir) makeDir(dir, dir);
-		return dir;
-	}
-	/** @since 1.1.0 */
-	@Override
-	public Path getLogDir(final String identifier,
-		final boolean shouldMakeDir
-	){
-		final var dir = getGlobalLogDir();
-		if(shouldMakeDir) makeDir(dir, dir);
-		return dir;
+	public Path getTemporaryDir(){
+		return composeDir(config.getSystem().getWorkingDir(), TEMPORARY_DIR);
 	}
 }

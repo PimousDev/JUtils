@@ -20,9 +20,11 @@ public class AppFileHandler extends FileHandler{
 		throws IOException
 	{
 		super(
-			context.getLogDir().resolve(LOG_FILE_NAME_FORMAT.formatted(
-				context.getProperties().getIdentifier()
-			)).toString(),
+			context.getDirs().getLogDir().resolve(
+				LOG_FILE_NAME_FORMAT.formatted(
+					context.getProperties().getIdentifier()
+				)
+			).toString(),
 			LOG_FILE_SIZE_MAX,
 			LOG_FILE_COUNT_MAX,
 			false

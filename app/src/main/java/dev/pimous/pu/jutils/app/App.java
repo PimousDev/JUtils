@@ -88,6 +88,7 @@ public abstract class App<C extends Configuration>{
 	public AppConfig getProperties(){ return appConfig; }
 	public boolean isLoaded(){ return loaded; }
 
+	public Directories getDirs(){ return dirs; }
 	public C getConfig(){ return config; }
 	public I18nBundle getI18n(){ return language.getBundle(); }
 	public TimeZone getTimeZone(){ return timeZone; }
@@ -102,26 +103,16 @@ public abstract class App<C extends Configuration>{
 		return executor.shutdownNow();
 	}
 
-	/** @since 1.1.0 */
-	public Path getConfigDir(){ return dirs.getConfigDir(getIdentifier()); }
-	/** @since 1.1.0 */
-	public Path getDataDir(){ return dirs.getDataDir(getIdentifier()); }
-	/** @since 1.1.0 */
-	public Path getCacheDir(){ return dirs.getCacheDir(getIdentifier()); }
-	/** @since 1.1.0 */
-	public Path getTempDir(){ return dirs.getTempDir(getIdentifier()); }
-	/** @since 1.1.0 */
-	public Path getLogDir(){ return dirs.getLogDir(getIdentifier()); }
 	@Deprecated
-	public File getConfigDirFile(){ return getConfigDir().toFile(); }
+	public File getConfigDirFile(){ return dirs.getConfigDir().toFile(); }
 	@Deprecated
-	public File getDataDirFile(){ return getDataDir().toFile(); }
+	public File getDataDirFile(){ return dirs.getDataDir().toFile(); }
 	@Deprecated
-	public File getCacheDirFile(){ return getCacheDir().toFile(); }
+	public File getCacheDirFile(){ return dirs.getCacheDir().toFile(); }
 	@Deprecated
-	public File getTempDirFile(){ return getTempDir().toFile(); }
+	public File getTempDirFile(){ return dirs.getTempDir().toFile(); }
 	@Deprecated
-	public File getLogDirFile(){ return getLogDir().toFile(); }
+	public File getLogDirFile(){ return dirs.getLogDir().toFile(); }
 
 	// SETTERS
 	public void setLoggingLevel(final Level level){
@@ -146,17 +137,16 @@ public abstract class App<C extends Configuration>{
 
 		// Configuration without errors
 		this.config = config;
-		dirs = Directories.create(config);
+		// TODO: Work on systems app or local dirs only.
+		dirs = Directories.create(this, false);
 		Throwable configException = null;
 
-		if(config.getPath() == null)
-			config.setPath(
-				dirs.getConfigDir(
-					getIdentifier(), this.config.getSectionCount() > 0
-				).resolve(DEFAULT_CONFIG_FILENAME)
-			);
-
 		if(this.config.getSectionCount() > 0){
+			if(config.getPath() == null)
+				config.setPath(
+					dirs.getConfigDir().resolve(DEFAULT_CONFIG_FILENAME)
+				);
+
 			try{
 				config.load();
 			}catch(Exception e){
@@ -225,7 +215,7 @@ public abstract class App<C extends Configuration>{
 
 		if(fhException != null)
 			getLogger().error(fhException,
-				getI18n().get("log.error.open", getLogDir())
+				getI18n().get("log.error.open", getDirs().getLogDir())
 			);
 
 		if(this.config.getSectionCount() == 0)

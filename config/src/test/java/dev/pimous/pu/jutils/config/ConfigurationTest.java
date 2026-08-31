@@ -83,7 +83,6 @@ class ConfigurationTest{
 		);
 		assertEquals("test", config.getEnv("undefined", "test"));
 	}
-	// TODO: Deprecated
 	@SuppressWarnings("deprecation")
 	@Test
 	void gettersDeprecated(){

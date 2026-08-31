@@ -14,6 +14,8 @@ public class AppConfig extends ConfigSection{
 
 	@ConfigField(mandatory = true)
 	private String identifier;
+	@ConfigField
+	private String group;
 	@ConfigField(mandatory = true)
 	private String name;
 	@ConfigField
@@ -38,6 +40,7 @@ public class AppConfig extends ConfigSection{
 	}
 
 	public String getIdentifier(){ return identifier; }
+	public String getGroup(){ return group; }
 	public String getName(){ return name; }
 	public String getDescription(){ return description; }
 	public Version getVersion(){ return version; }
